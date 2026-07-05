@@ -3,7 +3,10 @@ import { useState } from "react";
 import {
   Alert,
   ImageBackground,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -29,68 +32,74 @@ export default function Register() {
   };
 
   return (
-    <ImageBackground
-      source={require("../assets/images/background.png")}
-      style={styles.background}
-      resizeMode="cover"
+    <KeyboardAvoidingView style={{flex:1}}
+      behavior={Platform.OS==="ios" ? 'padding' : 'height'}
     >
-      <SafeAreaView style={styles.container}>
-        <View>
-          <Text style={styles.title}>Bienvenido a FinTrack</Text>
-          <Text style={styles.subtitle}>
-            Su rastreador de finanzas de confianza.
-          </Text>
-        </View>
+      <ScrollView>
+            <ImageBackground
+          source={require("../assets/images/background.png")}
+          style={styles.background}
+          resizeMode="cover"
+        >
+          <SafeAreaView style={styles.container}>
+            <View>
+              <Text style={styles.title}>Bienvenido a FinTrack</Text>
+              <Text style={styles.subtitle}>
+                Su rastreador de finanzas de confianza.
+              </Text>
+            </View>
 
-        <View style={styles.form}>
-          <Text style={styles.formtitle}>Registrese para continuar.</Text>
+            <View style={styles.form}>
+              <Text style={styles.formtitle}>Registrese para continuar.</Text>
 
-          <Text style={styles.labeltext}>Nombre:</Text>
-          <TextInput
-            style={styles.forminput}
-            placeholder="Nombre:"
-            value={name}
-            onChangeText={setName}
-          />
-          <Text style={styles.labeltext}>Apellido:</Text>
-          <TextInput
-            style={styles.forminput}
-            placeholder="Apellido:"
-            value={lastname}
-            onChangeText={setLastname}
-          />
+              <Text style={styles.labeltext}>Nombre:</Text>
+              <TextInput
+                style={styles.forminput}
+                placeholder="Nombre:"
+                value={name}
+                onChangeText={setName}
+              />
+              <Text style={styles.labeltext}>Apellido:</Text>
+              <TextInput
+                style={styles.forminput}
+                placeholder="Apellido:"
+                value={lastname}
+                onChangeText={setLastname}
+              />
 
-          <Text style={styles.labeltext}>Correo:</Text>
-          <TextInput
-            style={styles.forminput}
-            placeholder="Correo:"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-          />
+              <Text style={styles.labeltext}>Correo:</Text>
+              <TextInput
+                style={styles.forminput}
+                placeholder="Correo:"
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+              />
 
-          <Text style={styles.labeltext}>Contraseña:</Text>
-          <TextInput
-            style={styles.forminput}
-            placeholder="Contraseña:"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry={true}
-            autoCapitalize="none"
-          />
+              <Text style={styles.labeltext}>Contraseña:</Text>
+              <TextInput
+                style={styles.forminput}
+                placeholder="Contraseña:"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={true}
+                autoCapitalize="none"
+              />
 
-          <Pressable onPress={() => route.push("/")}>
-            <Text style={styles.formlinktext}>
-              ¿Ya tienes una cuenta? <Text>Inicia sesión aqui</Text>
-            </Text>
-          </Pressable>
+              <Pressable onPress={() => route.push("/")}>
+                <Text style={styles.formlinktext}>
+                  ¿Ya tienes una cuenta? <Text>Inicia sesión aqui</Text>
+                </Text>
+              </Pressable>
 
-          <Pressable style={styles.formbutton} onPress={handleRegister}>
-            <Text style={styles.formbuttontext}>Registrarse</Text>
-          </Pressable>
-        </View>
-      </SafeAreaView>
-    </ImageBackground>
+              <Pressable style={styles.formbutton} onPress={()=> Alert.alert("Registrado")}>
+                <Text style={styles.formbuttontext}>Registrarse</Text>
+              </Pressable>
+            </View>
+          </SafeAreaView>
+        </ImageBackground>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
