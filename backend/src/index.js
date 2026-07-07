@@ -1,13 +1,12 @@
-import cors from 'cors';
-import express from 'express';
-import auth from './routes/auth.js';
+import cors from "cors";
+import express from "express";
+import auth from "./routes/auth.js";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use('/api/auth', auth);
+app.use("/api/auth", auth);
 
 const PORT = 3000;
 
-
-app.listen(PORT,()=>console.log("Servidor corriendo en el puerto 3000"));
+app.listen(PORT, () => console.log("Servidor corriendo en el puerto 3000"));

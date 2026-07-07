@@ -26,17 +26,19 @@ export default function Register() {
     try {
       const data = await registerUser({ name, lastname, email, password });
       Alert.alert("Éxito", data.message);
+      route.push("/");
     } catch (error: any) {
       Alert.alert("Error", error.message);
     }
   };
 
   return (
-    <KeyboardAvoidingView style={{flex:1}}
-      behavior={Platform.OS==="ios" ? 'padding' : 'height'}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView>
-            <ImageBackground
+        <ImageBackground
           source={require("../assets/images/background.png")}
           style={styles.background}
           resizeMode="cover"
@@ -92,7 +94,7 @@ export default function Register() {
                 </Text>
               </Pressable>
 
-              <Pressable style={styles.formbutton} onPress={()=> Alert.alert("Registrado")}>
+              <Pressable style={styles.formbutton} onPress={handleRegister}>
                 <Text style={styles.formbuttontext}>Registrarse</Text>
               </Pressable>
             </View>

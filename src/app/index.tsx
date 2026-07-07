@@ -38,7 +38,7 @@ export default function HomeScreen() {
     <KeyboardAvoidingView
       style={styles.key}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
     >
       <ScrollView>
         <ImageBackground
