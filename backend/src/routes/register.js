@@ -15,12 +15,21 @@ router.post("/register", async (req, res) => {
       .json({ error: "La contraseña debe contener al menos 8 caracteres." });
   }
   try {
+
+    //Validar correo
+    const queryCorreo = "SELECT correo FROM usuarios WHERE correo = ?";
+    const [response] = await pool.execute(queryCorreo,[email]); 
+    if(response.length>0){
+      return res.status(400).json({error:"Correo ya registrado"});
+    }
+
     const query =
       "INSERT INTO usuarios( nombre, apellido, correo, password) VALUES (?, ?, ?, ?)";
     const hash = await bcrypt.hash(password, 10);
     const [result] = await pool.execute(query, [name, lastname, email, hash]);
     return res.status(201).json({ message: "usuario registrado con exito" });
-  } catch (error) {
+  } 
+  catch (error) {
     console.error("Error al insertar los datos: ", error.message);
     return res.status(500).json({ error: "Error interno del servidor" });
   }

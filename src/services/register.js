@@ -11,7 +11,7 @@ export default async function registerUser({
 }) {
   try {
     //peticion fetch con la URL
-    const res = await fetch(`${API_URL}/register`, {
+    const res = await fetch(`${API_URL}/register/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, lastname, email, password }),

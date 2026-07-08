@@ -1,6 +1,7 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
+  Alert,
   ImageBackground,
   KeyboardAvoidingView,
   Platform,
@@ -12,26 +13,22 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Login from '../services/login';
+
 
 export default function HomeScreen() {
   const route = useRouter();
   const [user, setUser] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  async function handleLogin() {
-    /*const {error} = await supabase.auth.signInWithPassword({
-      email: user,
-      password: password
-    });
-    if (error){
-      console.log("error", error.message)
-      Alert.alert('Error', 'Usuario o contraseña incorrectos')
-      return;
-    } */
-
-    //route.push('/dashboard');
-
-    if (user === "admin") {
+  
+  const handleLogin = async ()=>{
+    try{
+      const data = await Login({user, password});
       route.push("/dashboard");
+    }
+    catch(error:any){
+      const mensajeError = error.message || "Ocurrió un problema inesperado.";
+      Alert.alert("Error al iniciar sesión", mensajeError);
     }
   }
   return (
