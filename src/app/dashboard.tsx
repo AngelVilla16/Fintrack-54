@@ -19,6 +19,7 @@ export default function Dashboard() {
   const [saldo, setSaldo] = useState<number>(0.0);
   const [modalGasto, setModalGasto] = useState<boolean>(false);
   const [ingreso, setIngreso] = useState<string>("");
+  const [gasto, setGasto] = useState<string>("");
   const [modalIngreso, setModalIngreso] = useState<boolean>(false);
   const datasection = [
     {
@@ -32,27 +33,25 @@ export default function Dashboard() {
       data: ["Nómina", "Trabajo", "Donativo", "Inversión", "Otros"],
     },
   ];
-  //Funcion para cargar el nombre que aun no funciona xd
-  /* useEffect(()=>{
-        async function getName(){
-            const {data} = await supabase.auth.getUser();
-            const userId = data.user?.id;
-            const {data:profile} = await supabase
-                .from('profiles')
-                .select('nombre')
-                .eq('id', userId)
-                .single();
-
-            setName(profile?.nombre || '');
-            
-        }
-        
-        getName();
-    },[]);
-
-*/
+  
   //funcion para agregar ingreso
-  function handleIngreso() {}
+  function handleIngreso() {
+    
+    const ingresoActual = Number(ingreso);
+    const nuevoSaldo:number = saldo + ingresoActual;
+    
+    setModalIngreso(false);
+    setSaldo(nuevoSaldo);
+    setIngreso("");
+  }
+  function handleGasto(){
+    const gastoActual = Number(gasto);
+    const restaGasto:number = saldo - gastoActual;
+
+    setModalGasto(false);
+    setSaldo(restaGasto);
+    setGasto("");
+  }
   return (
     <ImageBackground
       source={require("../assets/images/background.png")}
@@ -120,22 +119,22 @@ export default function Dashboard() {
               <View style={styles.modalContentButtons}>
                 <Pressable
                   style={styles.modalButton}
-                  onPress={() => {
-                    setModalIngreso(false);
-                  }}
+                  onPress={handleIngreso}
                 >
                   <Text>Añadir Ingreso</Text>
                 </Pressable>
                 <Pressable
                   style={styles.modalButton}
-                  onPress={() => setModalIngreso(false)}
+                  onPress={()=> {setModalIngreso(false);}}
                 >
                   <Text>Cancelar</Text>
                 </Pressable>
               </View>
             </View>
           </View>
+
         </Modal>
+        //Gasto modal
         <Modal animationType="slide" transparent={true} visible={modalGasto}>
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
@@ -143,8 +142,8 @@ export default function Dashboard() {
 
               <TextInput
                 placeholder="$ 0.00"
-                value={ingreso}
-                onChangeText={setIngreso}
+                value={gasto}
+                onChangeText={setGasto}
                 keyboardType="numeric"
                 style={styles.modalInput}
               />
@@ -213,9 +212,7 @@ export default function Dashboard() {
 
               <Pressable
                 style={styles.modalButton}
-                onPress={() => {
-                  setModalGasto(false);
-                }}
+                onPress={handleGasto}
               >
                 <Text>Añadir gasto</Text>
               </Pressable>
@@ -233,7 +230,7 @@ export default function Dashboard() {
         <View>
           <Text style={styles.title}>Bienvenido!</Text>
           <Text style={styles.subtitle}>{name}</Text>
-
+                //Seccion de saldo disponible
           <View style={styles.saldosection}>
             <View>
               <Image
@@ -248,6 +245,7 @@ export default function Dashboard() {
               </Text>
             </View>
           </View>
+          //seccion de botones 
           <View style={styles.PressablesSection}>
             <Pressable
               style={styles.pressableButton}
