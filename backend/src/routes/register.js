@@ -34,11 +34,5 @@ router.post("/register", async (req, res) => {
     return res.status(500).json({ error: "Error interno del servidor" });
   }
 });
-// Ruta de prueba de diagnóstico
-router.get("/test", (req, res) => {
-  return res.json({
-    status: "ok",
-    message: "¡El backend de FinTrack está vivo y respondiendo JSON!",
-  });
-});
+
 export default router;

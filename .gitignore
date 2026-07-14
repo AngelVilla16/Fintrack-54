@@ -41,3 +41,6 @@ app-example
 # generated native folders
 /ios
 /android
+# Ignorar el archivo de entorno del backend
+backend/.env
+.env

@@ -1,15 +1,15 @@
 //import { supabase } from '@/lib/supabase';
 import { useState } from "react";
 import {
-  Image,
-  ImageBackground,
-  Modal,
-  Pressable,
-  SectionList,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
+    Image,
+    ImageBackground,
+    Modal,
+    Pressable,
+    SectionList,
+    StyleSheet,
+    Text,
+    TextInput,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -21,6 +21,8 @@ export default function Dashboard() {
   const [ingreso, setIngreso] = useState<string>("");
   const [gasto, setGasto] = useState<string>("");
   const [modalIngreso, setModalIngreso] = useState<boolean>(false);
+  const [tipo, setTipo] = useState<string>("");
+
   const datasection = [
     {
       title: "gastos",
@@ -34,15 +36,13 @@ export default function Dashboard() {
     },
   ];
   
-  //funcion para agregar ingreso
+  //funcion para calcular el saldo acorde a la operacion sisis  
   function handleIngreso() {
-    
-    const ingresoActual = Number(ingreso);
-    const nuevoSaldo:number = saldo + ingresoActual;
-    
-    setModalIngreso(false);
-    setSaldo(nuevoSaldo);
-    setIngreso("");
+    const monto = Number(ingreso);
+    const sumaIngreso:number = saldo + monto;
+    const tipo:string = "ingreso";
+
+   
   }
   function handleGasto(){
     const gastoActual = Number(gasto);
