@@ -44,3 +44,5 @@ app-example
 # Ignorar el archivo de entorno del backend
 backend/.env
 .env
+backend/.env
+.env
