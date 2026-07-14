@@ -10,7 +10,7 @@ router.post('/dashboard', async (req, res)=>{
     }
 
     try{
-        const query = "INSERT INTO movimientos(tipo_movimiento, concepto, id_usuario, saldo, monto) VALUES (?, ?, ?, ?)";
+        const query = "INSERT INTO movimientos(tipo_movimiento, concepto, id_usuario, saldo, monto) VALUES (?, ?, ?, ?, ?)";
 
         const [respone] = await pool.execute(query,[tipo, concepto, id_usuario, saldo, monto]);
         return res.status(201).json({message: "Movimiento registrado con exito!"});

@@ -1,5 +1,6 @@
 //import { supabase } from '@/lib/supabase';
-import { useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useEffect, useState } from "react";
 import {
     Image,
     ImageBackground,
@@ -14,8 +15,9 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Dashboard() {
+  const [id, setId] = useState("");
   const [selected, setSelected] = useState<string>("");
-  const [name, setName] = useState<string>("");
+  const [name, setName] = useState("");
   const [saldo, setSaldo] = useState<number>(0.0);
   const [modalGasto, setModalGasto] = useState<boolean>(false);
   const [ingreso, setIngreso] = useState<string>("");
@@ -35,10 +37,29 @@ export default function Dashboard() {
       data: ["Nómina", "Trabajo", "Donativo", "Inversión", "Otros"],
     },
   ];
-  
+
+  useEffect(()=>{
+    const getUsuario = async()=>{
+      try{
+        const idGuardado = await AsyncStorage.getItem('id_usuario');
+        const nombreUsuario:any = await AsyncStorage.getItem('nombre_usuario');
+        if(idGuardado !== null){
+          setId(idGuardado);
+          setName(nombreUsuario);
+        } 
+      } catch(e){
+        console.error("Error al leer el ID de AsyncStorage", e);
+      }
+    };
+    getUsuario();
+  },[]);
+
+
+
   //funcion para calcular el saldo acorde a la operacion sisis  
   function handleIngreso() {
     const monto = Number(ingreso);
+    const concepto:string = selected;
     const sumaIngreso:number = saldo + monto;
     const tipo:string = "ingreso";
 

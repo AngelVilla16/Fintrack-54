@@ -1,20 +1,20 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
-  Alert,
-  ImageBackground,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
+    Alert,
+    ImageBackground,
+    KeyboardAvoidingView,
+    Platform,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Login from '../services/login';
-
 
 export default function HomeScreen() {
   const route = useRouter();
@@ -22,8 +22,16 @@ export default function HomeScreen() {
   const [password, setPassword] = useState<string>("");
   
   const handleLogin = async ()=>{
+
+    if(!user || !password){
+      Alert.alert("Favor de llenar todos los campos!");
+      return;
+    }
     try{
       const data = await Login({user, password});
+      const id = data.usuario.id;
+      await AsyncStorage.setItem('id_usuario', String(id));
+      await AsyncStorage.setItem('nombre_usuario', data.usuario.nombre);
       route.push("/dashboard");
     }
     catch(error:any){
