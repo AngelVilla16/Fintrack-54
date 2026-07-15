@@ -70,9 +70,9 @@ Go to the backend folder
 - [ ] Add View the recent moves
 
 ## Project Structure
-```
+```bash
 Fintrack-54/
 ├── app/          # Frontend (Expo Router)
 ├── backend/      # API REST (Node + Express)
 └── ...
-``` 
+```
