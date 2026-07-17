@@ -1,0 +1,20 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Instalar dependencias
+        working-directory: backend
+        run: pnpm install
+
+      - name: Reiniciar backend con PM2
+        working-directory: backend
+        run: pm2 restart fintrack_backend
