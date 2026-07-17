@@ -15,6 +15,7 @@ async function testConnection() {
      
         const connection = await pool.getConnection();
         console.log("¡Conexión correcta con la base de datos MySQL!");
+        console.log("test de conexion");
         connection.release(); 
     } catch (error) {
         console.error("Error crítico al conectar con la base de datos: ", error.message);
