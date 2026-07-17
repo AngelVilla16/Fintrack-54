@@ -1,50 +1,78 @@
-# Welcome to your Expo app 👋
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+# Fintrack 54
 
-## Get started
+Fintrack 54 is a React Native app built with Expo 54 designed to help users manage their expenses and income in a visual, accessible, and easy way.
 
-1. Install dependencies
+## Tech Stack
 
-   ```bash
-   npm install
-   ```
+**Client:** React Native, CSS, Typescript
 
-2. Start the app
+**Server:** Node, Express, MySql
 
-   ```bash
-   npx expo start
-   ```
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Installation
+git clone https://github.com/AngelVilla16/Fintrack-54
 
 ```bash
-npm run reset-project
+    pnpm install 
+ ```
+In the backend folder, you need to install
+```bash
+    pnpm install
+    pnpm add express
+    pnpm add bcrypt
+    pnpm add mysql2
+```
+## Environment Variables
+
+To run this project, you will need to add the following environment variables to your /backend/.env file
+
+Example
+DB_HOST= YOUR_HOST
+DB_USER= YOUR_DB_USER
+DB_PASSWORD= YOUR_DB_PASSWORD
+DB_DATABASE= YOUR_DB
+
+
+
+
+## Run The Project
+
+
+```bash
+    pnpm expo start 
+    OR
+    pnpm run android
+    OR 
+    pnpm run ios
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Go to the backend folder
 
-## Learn more
+```bash
+  node src/index.js
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
 
-## Join the community
+## Features
 
-Join our community of developers creating universal apps.
+- Login and Register 
+- Auth 
+- Native Interface for Android and Ios
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+## Roadmap
+
+- [ ] Add Expenses and Income to the Database
+- [ ] Add Statistics and Graphics for Expenses 
+- [ ] Add View the recent moves
+
+## Project Structure
+```bash
+Fintrack-54/
+├── app/          # Frontend (Expo Router)
+├── backend/      # API REST (Node + Express)
+└── ...
+```
