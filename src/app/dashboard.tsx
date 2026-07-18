@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import regIngreso from '../services/dashboardIngreso';
-
+import regGasto from '../services/dashboardGasto';
 export default function Dashboard() {
   const [id, setId] = useState("");
   const [selected, setSelected] = useState<string>("");
@@ -55,7 +55,9 @@ export default function Dashboard() {
     const sumaIngreso: number = saldo + monto;
     const tipo: string = "ingreso";
 
-    
+    if(!monto || monto<=0){
+      Alert.alert("Se requiere ingresar una cantidad valida");
+    }
     if (!concepto) {
       Alert.alert("Categoría requerida", "Por favor selecciona un tipo de ingreso.");
       return;
@@ -78,21 +80,36 @@ export default function Dashboard() {
     }
   };
 
-  const handleGasto = () => {
-    const gastoActual = Number(gasto);
-    const concepto: string = selected;
-    const restaGasto: number = saldo - gastoActual;
+  const handleGasto = async ()=>{
+    const monto = Number(gasto);
 
-    if (!gasto || isNaN(gastoActual) || gastoActual <= 0) {
-      Alert.alert("Monto inválido", "Por favor introduce una cantidad de gasto válida.");
-      return;
+    const concepto: string = selected;
+    const restaGasto: number = saldo - monto;
+    const tipo:string = "gasto";
+
+    if(!monto || monto<=0){
+      Alert.alert("Se requiere ingresar una cantidad valida");
     }
     if (!concepto) {
       Alert.alert("Categoría requerida", "Por favor selecciona un tipo de gasto.");
       return;
     }
 
-    
+    try{
+      setModalGasto(false);
+      const data = await regGasto({tipo, concepto, id, restaGasto, monto });
+      setGasto("");
+      setModalGasto(false);
+      setSelected("");
+      Alert.alert("Gasto registrado", concepto);
+    }
+    catch (error) {
+      setModalGasto(true);
+      console.log("Error en handleIngreso:", error);
+      Alert.alert("Error", "Ocurrió un problema al registrar tu ingreso en el servidor.");
+    }
+
+
     setModalGasto(false);
     setSaldo(restaGasto);
     setGasto("");
