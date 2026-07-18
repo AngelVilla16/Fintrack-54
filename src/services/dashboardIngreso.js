@@ -5,19 +5,20 @@ export default async function ingreso({
     tipo,
     concepto,
     id,
-    saldo,
+    sumaIngreso,
     monto 
 }){
     try{
         const res = await fetch(`${API_URL}/dash/ingreso`,{
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({tipo, concepto, id, saldo, monto})
+            body: JSON.stringify({tipo, concepto, id, sumaIngreso, monto})
         });
+        
         const data = await res.json();
 
         if(!res.ok){
-            throw new Error("Error al registrar ingreso");
+            console.log("Error al registrar ingreso", Error );
         }
         return data;
 

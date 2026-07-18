@@ -1,7 +1,7 @@
-//import { supabase } from '@/lib/supabase';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import {
+    Alert,
     Image,
     ImageBackground,
     Modal,
@@ -13,6 +13,7 @@ import {
     View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import regIngreso from '../services/dashboardIngreso';
 
 export default function Dashboard() {
   const [id, setId] = useState("");
@@ -23,7 +24,6 @@ export default function Dashboard() {
   const [ingreso, setIngreso] = useState<string>("");
   const [gasto, setGasto] = useState<string>("");
   const [modalIngreso, setModalIngreso] = useState<boolean>(false);
-  const [tipo, setTipo] = useState<string>("");
 
   const datasection = [
     {
@@ -31,48 +31,85 @@ export default function Dashboard() {
       data: ["Vivienda", "salud", "ocio"],
     },
   ];
-  const ingresolist = [
-    {
-      title: "categorias",
-      data: ["Nómina", "Trabajo", "Donativo", "Inversión", "Otros"],
-    },
-  ];
-
-  useEffect(()=>{
-    const getUsuario = async()=>{
-      try{
+  
+  useEffect(() => {
+    const getUsuario = async () => {
+      try {
         const idGuardado = await AsyncStorage.getItem('id_usuario');
-        const nombreUsuario:any = await AsyncStorage.getItem('nombre_usuario');
-        if(idGuardado !== null){
+        const nombreUsuario: any = await AsyncStorage.getItem('nombre_usuario');
+        if (idGuardado !== null) {
           setId(idGuardado);
           setName(nombreUsuario);
         } 
-      } catch(e){
+      } catch (e) {
         console.error("Error al leer el ID de AsyncStorage", e);
       }
     };
     getUsuario();
-  },[]);
+  }, []);
 
-
-
-  //funcion para calcular el saldo acorde a la operacion sisis  
-  function handleIngreso() {
+  // Función para calcular el saldo acorde a la operación
+  const handleIngreso = async () => {
     const monto = Number(ingreso);
-    const concepto:string = selected;
-    const sumaIngreso:number = saldo + monto;
-    const tipo:string = "ingreso";
+    const concepto: string = selected;
+    const sumaIngreso: number = saldo + monto;
+    const tipo: string = "ingreso";
 
-   
-  }
-  function handleGasto(){
+    
+    if (!concepto) {
+      Alert.alert("Categoría requerida", "Por favor selecciona un tipo de ingreso.");
+      return;
+    }
+
+    try {
+      setModalIngreso(false); 
+
+      const data = await regIngreso({ tipo, concepto, id, sumaIngreso, monto });
+    
+      setIngreso("");
+      setSelected(""); 
+      setSaldo(sumaIngreso);
+      Alert.alert("Ingreso registrado", concepto);
+    }
+    catch (error) {
+      setModalIngreso(true); 
+      console.log("Error en handleIngreso:", error);
+      Alert.alert("Error", "Ocurrió un problema al registrar tu ingreso en el servidor.");
+    }
+  };
+
+  const handleGasto = () => {
     const gastoActual = Number(gasto);
-    const restaGasto:number = saldo - gastoActual;
+    const concepto: string = selected;
+    const restaGasto: number = saldo - gastoActual;
 
+    if (!gasto || isNaN(gastoActual) || gastoActual <= 0) {
+      Alert.alert("Monto inválido", "Por favor introduce una cantidad de gasto válida.");
+      return;
+    }
+    if (!concepto) {
+      Alert.alert("Categoría requerida", "Por favor selecciona un tipo de gasto.");
+      return;
+    }
+
+    
     setModalGasto(false);
     setSaldo(restaGasto);
     setGasto("");
-  }
+    setSelected(""); // Limpiamos la categoría seleccionada
+  };
+
+  // Helpers para abrir modales y limpiar la categoría anterior
+  const abrirModalIngreso = () => {
+    setSelected(""); 
+    setModalIngreso(true);
+  };
+
+  const abrirModalGasto = () => {
+    setSelected(""); 
+    setModalGasto(true);
+  };
+
   return (
     <ImageBackground
       source={require("../assets/images/background.png")}
@@ -80,7 +117,8 @@ export default function Dashboard() {
       resizeMode="cover"
     >
       <SafeAreaView style={styles.container}>
-        // Modales para añadir gasto e ingreso
+        
+        {/* Modales para añadir gasto e ingreso */}
         <Modal animationType="fade" transparent={true} visible={modalIngreso}>
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
@@ -104,7 +142,7 @@ export default function Dashboard() {
                     selected === "nomina" && styles.modalButtonListPressable,
                   ]}
                 >
-                  <Text>Nómina</Text>
+                  <Text style={styles.modalButtonText}>Nómina</Text>
                 </Pressable>
 
                 <Pressable
@@ -114,7 +152,7 @@ export default function Dashboard() {
                     selected === "freelance" && styles.modalButtonListPressable,
                   ]}
                 >
-                  <Text>Freelance</Text>
+                  <Text style={styles.modalButtonText}>Freelance</Text>
                 </Pressable>
 
                 <Pressable
@@ -124,7 +162,7 @@ export default function Dashboard() {
                     selected === "inversion" && styles.modalButtonListPressable,
                   ]}
                 >
-                  <Text>Inversión</Text>
+                  <Text style={styles.modalButtonText}>Inversión</Text>
                 </Pressable>
 
                 <Pressable
@@ -134,7 +172,7 @@ export default function Dashboard() {
                     selected === "otros" && styles.modalButtonListPressable,
                   ]}
                 >
-                  <Text>Otros </Text>
+                  <Text style={styles.modalButtonText}>Otros </Text>
                 </Pressable>
               </View>
               <View style={styles.modalContentButtons}>
@@ -146,16 +184,16 @@ export default function Dashboard() {
                 </Pressable>
                 <Pressable
                   style={styles.modalButton}
-                  onPress={()=> {setModalIngreso(false);}}
+                  onPress={() => { setModalIngreso(false); }}
                 >
                   <Text>Cancelar</Text>
                 </Pressable>
               </View>
             </View>
           </View>
-
         </Modal>
-        //Gasto modal
+
+        {/* Modal de Gasto */}
         <Modal animationType="slide" transparent={true} visible={modalGasto}>
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
@@ -179,7 +217,7 @@ export default function Dashboard() {
                     selected === "comida" && styles.modalButtonListPressable,
                   ]}
                 >
-                  <Text>Comida</Text>
+                  <Text style={styles.modalButtonText}>Comida</Text>
                 </Pressable>
 
                 <Pressable
@@ -189,7 +227,7 @@ export default function Dashboard() {
                     selected === "vivienda" && styles.modalButtonListPressable,
                   ]}
                 >
-                  <Text>Vivienda</Text>
+                  <Text style={styles.modalButtonText}>Vivienda</Text>
                 </Pressable>
 
                 <Pressable
@@ -199,7 +237,7 @@ export default function Dashboard() {
                     selected === "servicios" && styles.modalButtonListPressable,
                   ]}
                 >
-                  <Text>Servicios</Text>
+                  <Text style={styles.modalButtonText}>Servicios</Text>
                 </Pressable>
 
                 <Pressable
@@ -209,7 +247,7 @@ export default function Dashboard() {
                     selected === "salud" && styles.modalButtonListPressable,
                   ]}
                 >
-                  <Text>Salud</Text>
+                  <Text style={styles.modalButtonText}>Salud</Text>
                 </Pressable>
                 <Pressable
                   onPress={() => setSelected("ocio")}
@@ -218,7 +256,7 @@ export default function Dashboard() {
                     selected === "ocio" && styles.modalButtonListPressable,
                   ]}
                 >
-                  <Text>Ocio</Text>
+                  <Text style={styles.modalButtonText}>Ocio</Text>
                 </Pressable>
                 <Pressable
                   onPress={() => setSelected("otros")}
@@ -227,7 +265,7 @@ export default function Dashboard() {
                     selected === "otros" && styles.modalButtonListPressable,
                   ]}
                 >
-                  <Text>Otros</Text>
+                  <Text style={styles.modalButtonText}>Otros</Text>
                 </Pressable>
               </View>
 
@@ -248,10 +286,13 @@ export default function Dashboard() {
             </View>
           </View>
         </Modal>
+
+        {/* Vista principal del Dashboard */}
         <View>
           <Text style={styles.title}>Bienvenido!</Text>
           <Text style={styles.subtitle}>{name}</Text>
-                //Seccion de saldo disponible
+          
+          {/* Sección de saldo disponible */}
           <View style={styles.saldosection}>
             <View>
               <Image
@@ -262,15 +303,16 @@ export default function Dashboard() {
             <View style={styles.titulosectionsaldo}>
               <Text style={styles.text}>Saldo disponible</Text>
               <Text style={styles.saldo}>
-                $<Text> {saldo}</Text>
+                $ <Text>{saldo}</Text>
               </Text>
             </View>
           </View>
-          //seccion de botones 
+
+          {/* Sección de botones */}
           <View style={styles.PressablesSection}>
             <Pressable
               style={styles.pressableButton}
-              onPress={() => setModalIngreso(true)}
+              onPress={abrirModalIngreso}
             >
               <Image
                 source={require("../assets/images/agregar.png")}
@@ -284,7 +326,7 @@ export default function Dashboard() {
             </Pressable>
             <Pressable
               style={styles.pressableButton}
-              onPress={() => setModalGasto(true)}
+              onPress={abrirModalGasto}
             >
               <Image
                 source={require("../assets/images/eliminar.png")}
@@ -308,7 +350,7 @@ export default function Dashboard() {
                   keyExtractor={(item, index) => item + index}
                   renderItem={({ item }) => (
                     <View>
-                      <Text>{item}</Text>
+                      <Text style={{ color: "#fff" }}>{item}</Text>
                     </View>
                   )}
                 />
@@ -316,7 +358,7 @@ export default function Dashboard() {
             </View>
           </View>
 
-          <View>
+          <View style={{ marginTop: 15 }}>
             <Text style={styles.title}>Ultimas transacciones:</Text>
           </View>
         </View>
@@ -354,7 +396,6 @@ const styles = StyleSheet.create({
     margin: 10,
     backgroundColor: "#0000009e",
     flexDirection: "row",
-
     width: 355,
     height: 100,
     borderRadius: 15,
@@ -389,6 +430,7 @@ const styles = StyleSheet.create({
   },
   gastossection: {
     padding: 10,
+    marginTop: 10,
     flexDirection: "row",
     justifyContent: "space-between",
     backgroundColor: "#05386b74",
@@ -419,18 +461,18 @@ const styles = StyleSheet.create({
     margin: 3,
   },
   modalInput: {
-    margin: 3,
+    margin: 10,
     padding: 3,
     borderWidth: 1,
     borderColor: "black",
     borderRadius: 10,
     width: "50%",
-    height: 30,
-    alignItems: "center",
+    height: 40,
+    textAlign: "center",
   },
   modalList: {
     padding: 6,
-    width: 200,
+    width: 250,
     height: 130,
     flexDirection: "row",
     justifyContent: "center",
@@ -438,22 +480,26 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
   },
   modalButton: {
-    margin: 3,
+    margin: 5,
     padding: 10,
     alignSelf: "center",
     borderWidth: 1,
     borderColor: "#000000",
     borderRadius: 10,
+    minWidth: 120,
+    alignItems: 'center',
   },
   modalButtonList: {
-    padding: 1,
-    width: "37%",
+    padding: 5,
+    width: "40%",
     borderWidth: 1,
     borderColor: "black",
     borderRadius: 5,
     margin: 3,
-    flexDirection: "column",
-    textAlign: "center",
+    alignItems: "center",
+  },
+  modalButtonText: {
+    textAlign: 'center',
   },
   modalButtonListPressable: {
     backgroundColor: "#9a9a9a76",
