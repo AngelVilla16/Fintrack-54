@@ -40,4 +40,28 @@ router.post('/gasto', async (req, res)=>{
     }
 });
 
+router.get('/saldo/:id', async (req, res)=>{
+   const {id} = req.params;
+
+   if(!id){
+       return res.status(400).json({error: "No se pudo obtener el id del usuario"});
+   }
+
+   try{
+       const query = "SELECT saldo FROM movimientos WHERE id_usuario = ? ORDER BY id_movimiento DESC LIMIT 1";
+       const [response] = await pool.execute(query, [id]);
+
+       if(response.lenth === 0){
+           return res.status(200).json({saldo:0});
+       }
+
+       return res.status(200).json(response[0]);
+   }
+   catch(error){
+       console.error("Error al obtener el saldo del usuario", error);
+
+       return res.status(500).json("Error interno del servidor al obtener el saldo del usuario");
+   }
+});
+
 export default router;

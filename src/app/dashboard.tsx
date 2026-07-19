@@ -15,6 +15,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import regIngreso from '../services/dashboardIngreso';
 import regGasto from '../services/dashboardGasto';
+import getSaldo from '../services/dashboardSaldo';
+
 export default function Dashboard() {
   const [id, setId] = useState("");
   const [selected, setSelected] = useState<string>("");
@@ -48,6 +50,22 @@ export default function Dashboard() {
     getUsuario();
   }, []);
 
+  //funcion para traer el saldo desde la base de datos JAJA
+  useEffect(()=>{
+    async function fetchSaldo(){
+      try{
+        const data = await getSaldo(id);
+        setSaldo(data.saldo);
+
+      }
+      catch(error){
+        console.error("Error al traer el saldo del usuario", error);
+      }
+
+    }
+    fetchSaldo();
+  },[id]);
+
   // Función para calcular el saldo acorde a la operación
   const handleIngreso = async () => {
     const monto = Number(ingreso);
@@ -57,6 +75,7 @@ export default function Dashboard() {
 
     if(!monto || monto<=0){
       Alert.alert("Se requiere ingresar una cantidad valida");
+      return;
     }
     if (!concepto) {
       Alert.alert("Categoría requerida", "Por favor selecciona un tipo de ingreso.");

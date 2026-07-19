@@ -18,7 +18,7 @@ export default async function ingreso({
         const data = await res.json();
 
         if(!res.ok){
-            console.log("Error al registrar ingreso", Error );
+            console.log("Error al registrar ingreso");
         }
         return data;
 
