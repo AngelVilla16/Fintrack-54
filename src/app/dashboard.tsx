@@ -55,7 +55,7 @@ export default function Dashboard() {
     async function fetchSaldo(){
       try{
         const data = await getSaldo(id);
-        setSaldo(data.saldo);
+        setSaldo(Number(data.saldo) || 0);
 
       }
       catch(error){
@@ -70,7 +70,7 @@ export default function Dashboard() {
   const handleIngreso = async () => {
     const monto = Number(ingreso);
     const concepto: string = selected;
-    const sumaIngreso: number = saldo + monto;
+    const sumaIngreso: number = Number(saldo) + monto;
     const tipo: string = "ingreso";
 
     if(!monto || monto<=0){
@@ -103,7 +103,7 @@ export default function Dashboard() {
     const monto = Number(gasto);
 
     const concepto: string = selected;
-    const restaGasto: number = saldo - monto;
+    const restaGasto: number = Number(saldo) - monto;
     const tipo:string = "gasto";
 
     if(!monto || monto<=0){
@@ -339,7 +339,7 @@ export default function Dashboard() {
             <View style={styles.titulosectionsaldo}>
               <Text style={styles.text}>Saldo disponible</Text>
               <Text style={styles.saldo}>
-                $ <Text>{saldo}</Text>
+                $ <Text>{Number(saldo).toFixed(2)}</Text>
               </Text>
             </View>
           </View>

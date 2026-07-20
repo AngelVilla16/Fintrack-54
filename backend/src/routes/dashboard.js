@@ -36,7 +36,7 @@ router.post('/gasto', async (req, res)=>{
     }
     catch(error){
         console.error("Error al insertar los datos: ",  error);
-        return res.status(500).json("Error interno al insertar los datos");
+        return res.status(500).json({error: "Error interno al insertar los datos"});
     }
 });
 
@@ -51,16 +51,16 @@ router.get('/saldo/:id', async (req, res)=>{
        const query = "SELECT saldo FROM movimientos WHERE id_usuario = ? ORDER BY id_movimiento DESC LIMIT 1";
        const [response] = await pool.execute(query, [id]);
 
-       if(response.lenth === 0){
+       if(response.length === 0){
            return res.status(200).json({saldo:0});
        }
 
        return res.status(200).json(response[0]);
    }
    catch(error){
-       console.error("Error al obtener el saldo del usuario", error);
 
-       return res.status(500).json("Error interno del servidor al obtener el saldo del usuario");
+
+       return res.status(500).json({error: "Error interno del servidor al obtener el saldo del usuario"});
    }
 });
 
