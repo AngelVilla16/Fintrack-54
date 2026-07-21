@@ -64,4 +64,19 @@ router.get('/saldo/:id', async (req, res)=>{
    }
 });
 
+router.get('/gastos-categoria/:id', async (req, res)=>{
+    const {id} = req.params;
+
+    try{
+        const query = 'SELECT concepto, SUM(monto) as total FROM movimientos WHERE id_usuario = ? AND tipo_movimiento = "gasto" GROUP BY concepto ORDER BY total DESC';
+
+        const [rows] = await pool.execute(query, [id]);
+
+        return res.status(200).json(rows);
+    }
+    catch(error){
+        return res.status(500).json({error: "Error interno del servidor al obteners los gastos"});
+    }
+});
+
 export default router;

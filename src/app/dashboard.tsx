@@ -6,16 +6,17 @@ import {
     ImageBackground,
     Modal,
     Pressable,
-    SectionList,
     StyleSheet,
     Text,
     TextInput,
-    View,
+    View
 } from "react-native";
+import { PieChart } from 'react-native-gifted-charts';
 import { SafeAreaView } from "react-native-safe-area-context";
-import regIngreso from '../services/dashboardIngreso';
 import regGasto from '../services/dashboardGasto';
+import regIngreso from '../services/dashboardIngreso';
 import getSaldo from '../services/dashboardSaldo';
+import gastosPorCategoria from '../services/gastos-categoria';
 
 export default function Dashboard() {
   const [id, setId] = useState("");
@@ -34,6 +35,49 @@ export default function Dashboard() {
     },
   ];
   
+  //Definir colores para la grafica
+  const COLORES_CATEGORIA: Record<string, string> ={
+    comida: '#00a465',
+    vivienda: '#1B6E76',
+    servicios: '#3E9BA8',
+    salud: '#E7B448',
+    ocio: '#D8664F',
+    otros: '#8A94A6', 
+  };
+  const [gastosData, setGastosData] = useState<
+  { value: number; color: string; label: string; text: string }[]
+>([]);
+
+useEffect(() => {
+  if (!id) return;
+
+  async function fetchGastos() {
+    try {
+      const data = await gastosPorCategoria(id);
+
+      const total = data.reduce((sum: number, item: any) => sum + Number(item.total), 0);
+
+      const formatted = data.map((item: any) => {
+        const valor = Number(item.total);
+        const porcentaje = total > 0 ? (valor / total) * 100 : 0;
+        return {
+          value: valor,
+          color: COLORES_CATEGORIA[item.concepto] || '#8A94A6',
+          label: item.concepto,
+          text: `${porcentaje.toFixed(0)}%`,
+        };
+      });
+
+      setGastosData(formatted);
+    } catch (error) {
+      console.error("Error al traer gastos por categoría", error);
+    }
+  }
+
+  fetchGastos();
+}, [id, saldo]); // 👈 se vuelve a calcular cuando cambia el saldo (tras un nuevo gasto)
+
+
   useEffect(() => {
     const getUsuario = async () => {
       try {
@@ -376,22 +420,51 @@ export default function Dashboard() {
             </Pressable>
           </View>
 
-          <View style={styles.gastossection}>
+         <View style={styles.gastossection}>
             <Text style={styles.subtitle}>Gasto por categoria</Text>
-            <View>
-              <View />
-              <View>
-                <SectionList
-                  sections={datasection}
-                  keyExtractor={(item, index) => item + index}
-                  renderItem={({ item }) => (
-                    <View>
-                      <Text style={{ color: "#fff" }}>{item}</Text>
-                    </View>
+            {gastosData.length > 0 ? (
+              <View style={{ alignItems: 'center', marginTop: 10 }}>
+                <PieChart
+                  data={gastosData}
+                  donut
+                  radius={80}
+                  innerRadius={50}
+                  showText
+                  textColor="#fff"
+                  textSize={12}
+                  centerLabelComponent={() => (
+                    <Text style={{ color: '#fff', fontSize: 12 }}>Gastos</Text>
                   )}
                 />
+                {/* Leyenda manual debajo */}
+                <View style={{ marginTop: 16, width: '100%' }}>
+                  {gastosData.map((item, index) => (
+                    <View
+                      key={index}
+                      style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}
+                    >
+                      <View
+                        style={{
+                          width: 10,
+                          height: 10,
+                          borderRadius: 5,
+                          backgroundColor: item.color,
+                          marginRight: 8,
+                        }}
+                      />
+                      <Text style={{ color: '#fff', fontSize: 13, flex: 1 }}>
+                        {item.label.charAt(0).toUpperCase() + item.label.slice(1)}
+                      </Text>
+                      <Text style={{ color: '#fff', fontSize: 13 }}>{item.text}</Text>
+                    </View>
+                  ))}
+                </View>
               </View>
-            </View>
+            ) : (
+              <Text style={{ color: '#ffffffaa', marginTop: 10 }}>
+                Aún no tienes gastos registrados.
+              </Text>
+            )}
           </View>
 
           <View style={{ marginTop: 15 }}>
