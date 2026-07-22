@@ -12,6 +12,6 @@ app.use(express.json());
 app.use("/api/auth", register);
 app.use("/api/auth", login);
 app.use("/api/dash", dashboard);
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => console.log("Servidor corriendo en el puerto 3000"));
