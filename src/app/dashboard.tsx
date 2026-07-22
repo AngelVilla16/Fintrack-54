@@ -36,6 +36,7 @@ export default function Dashboard() {
   ];
   
   //Definir colores para la grafica
+  //PieChart solo entiende el color y el valor, aqui se define fijamente los valores de color por categoria
   const COLORES_CATEGORIA: Record<string, string> ={
     comida: '#00a465',
     vivienda: '#1B6E76',
@@ -44,6 +45,7 @@ export default function Dashboard() {
     ocio: '#D8664F',
     otros: '#8A94A6', 
   };
+  //Este es el value que entiende PieChart para tomar los datos de la grafica 
   const [gastosData, setGastosData] = useState<
   { value: number; color: string; label: string; text: string }[]
 >([]);
@@ -54,12 +56,13 @@ useEffect(() => {
   async function fetchGastos() {
     try {
       const data = await gastosPorCategoria(id);
-
+      //De los datos traidos desde la base de datos por ID obtenemos el procentaje  y
       const total = data.reduce((sum: number, item: any) => sum + Number(item.total), 0);
-
+      //mapeamos los datos que va a recibir piechart
       const formatted = data.map((item: any) => {
         const valor = Number(item.total);
         const porcentaje = total > 0 ? (valor / total) * 100 : 0;
+        //regresamos los datos formateados para piechart especificando los datos que reconoce siendo value y color
         return {
           value: valor,
           color: COLORES_CATEGORIA[item.concepto] || '#8A94A6',
@@ -75,7 +78,7 @@ useEffect(() => {
   }
 
   fetchGastos();
-}, [id, saldo]); // 👈 se vuelve a calcular cuando cambia el saldo (tras un nuevo gasto)
+}, [id, saldo]); // En tiempo real vuelve a calcular el saldo
 
 
   useEffect(() => {
@@ -424,7 +427,9 @@ useEffect(() => {
             <Text style={styles.subtitle}>Gasto por categoria</Text>
             {gastosData.length > 0 ? (
               <View style={{ alignItems: 'center', marginTop: 10 }}>
-                <PieChart
+              {/* Aqui PieChart toma los datos que mapeamos anteriormente y renderiza una grafica de dona con una seccion proporcional al valor (value) con el color asignado y el texto (label) */}
+              <View style={styles.grafica}>
+                  <PieChart
                   data={gastosData}
                   donut
                   radius={80}
@@ -435,7 +440,9 @@ useEffect(() => {
                   centerLabelComponent={() => (
                     <Text style={{ color: '#fff', fontSize: 12 }}>Gastos</Text>
                   )}
+                  
                 />
+              </View>
                 {/* Leyenda manual debajo */}
                 <View style={{ marginTop: 16, width: '100%' }}>
                   {gastosData.map((item, index) => (
@@ -540,8 +547,7 @@ const styles = StyleSheet.create({
   gastossection: {
     padding: 10,
     marginTop: 10,
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: "column",
     backgroundColor: "#05386b74",
     borderRadius: 10,
     height: "auto",
@@ -613,4 +619,11 @@ const styles = StyleSheet.create({
   modalButtonListPressable: {
     backgroundColor: "#9a9a9a76",
   },
+  grafica:{
+    margin:5,
+    padding:5,
+    alignSelf: "center",
+    alignItems: "center",
+
+  }
 });
