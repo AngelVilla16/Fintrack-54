@@ -1,0 +1,27 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00C17A"/>
+      <stop offset="55%" stop-color="#00A465"/>
+      <stop offset="100%" stop-color="#00623D"/>
+    </linearGradient>
+    <linearGradient id="sheen" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="1024" height="1024" rx="220" fill="url(#bg)"/>
+  <rect x="0" y="0" width="1024" height="512" rx="220" fill="url(#sheen)"/>
+
+  <g>
+    <rect x="372" y="288" width="88" height="456" rx="18" fill="#F5FBF8"/>
+    <rect x="372" y="288" width="272" height="88" rx="18" fill="#F5FBF8"/>
+    <rect x="372" y="472" width="208" height="88" rx="18" fill="#F5FBF8"/>
+  </g>
+
+  <g stroke="#9DEFC9" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <polyline points="660,430 706,378 748,404 806,318"/>
+  </g>
+  <circle cx="806" cy="318" r="17" fill="#9DEFC9"/>
+</svg>
