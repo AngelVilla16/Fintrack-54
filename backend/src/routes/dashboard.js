@@ -68,7 +68,7 @@ router.get('/gastos-categoria/:id', async (req, res)=>{
     const {id} = req.params;
 
     try{
-        const query = 'SELECT concepto, SUM(monto) as total FROM movimientos WHERE id_usuario = ? AND tipo_movimiento = "gasto" GROUP BY concepto ORDER BY total DESC';
+        const query = `SELECT concepto, SUM(monto) as total FROM movimientos WHERE id_usuario = ? AND tipo_movimiento = 'gasto' GROUP BY concepto ORDER BY total DESC`;
 
         const [rows] = await pool.execute(query, [id]);
 
