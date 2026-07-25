@@ -9,6 +9,7 @@ import {
     Pressable,
     ScrollView,
     StyleSheet,
+    Switch,
     Text,
     TextInput,
     View,
@@ -20,7 +21,15 @@ export default function HomeScreen() {
   const route = useRouter();
   const [user, setUser] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  
+  const [isEnable, setIsEnable] = useState<boolean>(false);
+  const [secure, setSecure] = useState<boolean>(true);
+
+  const toggleSwitch = () => {
+    const nextState = !isEnable;
+    setIsEnable(nextState);
+    setSecure(!nextState); // Si nextState es true, secure pasa a false, y viceversa
+  };
+
   const handleLogin = async ()=>{
 
     if(!user || !password){
@@ -74,16 +83,24 @@ export default function HomeScreen() {
                 onChangeText={setUser}
                 autoCapitalize="none"
               />
-              <Text style={styles.labeltext}>Contraseña</Text>
-              <TextInput
-                style={styles.forminput}
-                placeholder="Contraseña: "
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={true}
-                autoCapitalize="none"
-              />
+              <View style={styles.passSection}>
 
+                <Text style={styles.labeltext}>Contraseña:</Text>
+                <TextInput
+                  style={styles.forminput}
+                  placeholder="Contraseña:"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={secure}
+                  autoCapitalize="none"
+                />
+                <Text style={styles.labeltext}> Mostrar contraseña:</Text>
+                <Switch onValueChange={toggleSwitch}
+                    trackColor={{false: '#767577', true: '#58ff8a'}}
+                    thumbColor={isEnable ? '#006839' : '#f4f3f4'}
+                    value={isEnable}
+                />
+              </View>
               <Pressable onPress={() => route.push("/register")}>
                 <Text style={styles.formlinktext}>
                   ¿No estas registrado? <Text>Registrate aqui</Text>
@@ -181,5 +198,12 @@ const styles = StyleSheet.create({
   formlinktext: {
     color: "#ffff",
     fontSize: 18,
+  },
+    passSection:{
+    display:"flex",
+    flexDirection:"column",
+    margin:2,
+    padding:3,
+    alignItems:"center"
   },
 });
