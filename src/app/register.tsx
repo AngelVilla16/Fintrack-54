@@ -1,16 +1,17 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
-  Alert,
-  ImageBackground,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
+    Alert,
+    ImageBackground,
+    KeyboardAvoidingView,
+    Platform,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Switch,
+    Text,
+    TextInput,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import registerUser from "../services/register";
@@ -21,6 +22,14 @@ export default function Register() {
   const [password, setPassword] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [lastname, setLastname] = useState<string>("");
+  const [isEnable, setIsEnable] = useState<boolean>(false);
+  const [secure, setSecure] = useState<boolean>(true);
+
+  const toggleSwitch = () => {
+    const nextState = !isEnable;
+    setIsEnable(nextState);
+    setSecure(!nextState); // Si nextState es true, secure pasa a false, y viceversa
+  };
 
   const handleRegister = async () => {
     try {
@@ -77,16 +86,24 @@ export default function Register() {
                 onChangeText={setEmail}
                 autoCapitalize="none"
               />
+              <View style={styles.passSection}>
 
-              <Text style={styles.labeltext}>Contraseña:</Text>
-              <TextInput
-                style={styles.forminput}
-                placeholder="Contraseña:"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={true}
-                autoCapitalize="none"
-              />
+                <Text style={styles.labeltext}>Contraseña:</Text>
+                <TextInput
+                  style={styles.forminput}
+                  placeholder="Contraseña:"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={secure}
+                  autoCapitalize="none"
+                />
+                <Text style={styles.labeltext}> Mostrar contraseña:</Text>
+                <Switch onValueChange={toggleSwitch}
+                    trackColor={{false: '#767577', true: '#58ff8a'}}
+                    thumbColor={isEnable ? '#006839' : '#f4f3f4'}
+                    value={isEnable}
+                />
+              </View>
 
               <Pressable onPress={() => route.push("/")}>
                 <Text style={styles.formlinktext}>
@@ -181,5 +198,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#ffff",
     fontSize: 18,
+  },
+  passSection:{
+    display:"flex",
+    flexDirection:"column",
+    margin:2,
+    padding:3,
+    alignItems:"center"
   },
 });

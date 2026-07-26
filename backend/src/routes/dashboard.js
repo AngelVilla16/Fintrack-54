@@ -79,4 +79,22 @@ router.get('/gastos-categoria/:id', async (req, res)=>{
     }
 });
 
+router.get('/movimientos/:id', async (req, res)=>{
+   const {id} = req.params;
+
+   try{
+       const query = 'SELECT monto, tipo_movimiento as categoria, concepto, id_movimiento FROM movimientos WHERE id_usuario = ? ORDER BY id_movimiento DESC LIMIT 10';
+       const [response] = await pool.execute(query, [id]);
+
+       if(response.length === 0){
+           return res.status(200).json([]);
+       }
+       return res.status(200).json(response);
+   }
+   catch(error){
+        console.error("Error en dash-movimientos:", error);
+        return res.status(500).json({error:"Error interno del servidor"});
+   }
+});
+
 export default router;
