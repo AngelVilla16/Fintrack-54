@@ -2,23 +2,24 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import {
     Alert,
+    FlatList,
     Image,
     ImageBackground,
     Modal,
     Pressable,
+    ScrollView,
     StyleSheet,
     Text,
     TextInput,
-    View,
-    FlatList,
+    View
 } from "react-native";
 import { PieChart } from 'react-native-gifted-charts';
 import { SafeAreaView } from "react-native-safe-area-context";
 import regGasto from '../services/dashboardGasto';
 import regIngreso from '../services/dashboardIngreso';
+import movimientos from '../services/dashboardMovimientos';
 import getSaldo from '../services/dashboardSaldo';
 import gastosPorCategoria from '../services/gastos-categoria';
-import movimientos from '../services/dashboardMovimientos';
 
 
 export default function Dashboard() {
@@ -215,7 +216,8 @@ useEffect(() => {
   };
 
   return (
-    <ImageBackground
+    <ScrollView>
+          <ImageBackground
       source={require("../assets/images/background.png")}
       style={styles.Background}
       resizeMode="cover"
@@ -510,6 +512,7 @@ useEffect(() => {
         </View>
       </SafeAreaView>
     </ImageBackground>
+    </ScrollView>
   );
 }
 
