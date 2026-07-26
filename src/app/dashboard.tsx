@@ -7,7 +7,6 @@ import {
     ImageBackground,
     Modal,
     Pressable,
-    ScrollView,
     StyleSheet,
     Text,
     TextInput,
@@ -216,14 +215,10 @@ useEffect(() => {
   };
 
   return (
-    <ScrollView>
-          <ImageBackground
-      source={require("../assets/images/background.png")}
+    <ImageBackground  source={require("../assets/images/background.png")}
       style={styles.Background}
-      resizeMode="cover"
-    >
-      <SafeAreaView style={styles.container}>
-        
+      resizeMode="cover">
+      <SafeAreaView>
         {/* Modales para añadir gasto e ingreso */}
         <Modal animationType="fade" transparent={true} visible={modalIngreso}>
           <View style={styles.modalOverlay}>
@@ -510,9 +505,10 @@ useEffect(() => {
               />
           </View>
         </View>
+    
+    
       </SafeAreaView>
     </ImageBackground>
-    </ScrollView>
   );
 }
 
