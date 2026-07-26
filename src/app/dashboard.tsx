@@ -9,7 +9,8 @@ import {
     StyleSheet,
     Text,
     TextInput,
-    View
+    View,
+    FlatList,
 } from "react-native";
 import { PieChart } from 'react-native-gifted-charts';
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,6 +18,8 @@ import regGasto from '../services/dashboardGasto';
 import regIngreso from '../services/dashboardIngreso';
 import getSaldo from '../services/dashboardSaldo';
 import gastosPorCategoria from '../services/gastos-categoria';
+import movimientos from '../services/dashboardMovimientos';
+
 
 export default function Dashboard() {
   const [id, setId] = useState("");
@@ -49,6 +52,9 @@ export default function Dashboard() {
   const [gastosData, setGastosData] = useState<
   { value: number; color: string; label: string; text: string }[]
 >([]);
+
+  const [movs, setMovs] = useState<any>([]);
+
 
 useEffect(() => {
   if (!id) return;
@@ -112,6 +118,21 @@ useEffect(() => {
     }
     fetchSaldo();
   },[id]);
+
+  //Función para obtener los movimientos mas recientes
+  useEffect(()=>{
+    async function fetchMovs(){
+      try{
+        const data = await movimientos(id);
+        setMovs(data);
+      }
+      catch(error){
+        console.error("Error al traer los movimientos del usuario: ", error);
+      }
+
+    }
+    fetchMovs();
+  },[id, saldo]);
 
   // Función para calcular el saldo acorde a la operación
   const handleIngreso = async () => {
@@ -474,8 +495,17 @@ useEffect(() => {
             )}
           </View>
 
-          <View style={{ marginTop: 15 }}>
+          <View style={ styles.transacciones}>
             <Text style={styles.title}>Ultimas transacciones:</Text>
+            <FlatList scrollEnabled={false} data={movs} keyExtractor={(item, index)=> item.id?.toString() || index.toString()}
+                      renderItem={({item})=>(
+                          <View style={styles.movimientos}>
+                            <Text style={styles.movText}>{item.concepto}</Text>
+                            <Text style={styles.movText}>{item.categoria}</Text>
+                            <Text style={styles.movText}> {item.monto}</Text>
+                          </View>
+                      )}
+              />
           </View>
         </View>
       </SafeAreaView>
@@ -624,6 +654,31 @@ const styles = StyleSheet.create({
     padding:5,
     alignSelf: "center",
     alignItems: "center",
+
+  },
+  transacciones:{
+    display: "flex",
+    marginTop: 15,
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  movimientos:{
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignSelf: "center",
+    color:"white",
+    margin:3,
+    padding:3
+  },
+  movText:{
+    color:"white",
+    textAlign: "center",
+    fontSize: 18,
+    justifyContent: "space-between",
+    margin:3,
+
 
   }
 });
