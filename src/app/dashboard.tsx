@@ -218,7 +218,7 @@ useEffect(() => {
     <ImageBackground  source={require("../assets/images/background.png")}
       style={styles.Background}
       resizeMode="cover">
-      <SafeAreaView>
+      <SafeAreaView style={styles.container}>
         {/* Modales para añadir gasto e ingreso */}
         <Modal animationType="fade" transparent={true} visible={modalIngreso}>
           <View style={styles.modalOverlay}>
