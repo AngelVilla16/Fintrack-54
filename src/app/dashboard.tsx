@@ -7,6 +7,7 @@ import {
     ImageBackground,
     Modal,
     Pressable,
+    ScrollView,
     StyleSheet,
     Text,
     TextInput,
@@ -387,6 +388,7 @@ useEffect(() => {
             </View>
           </View>
         </Modal>
+        <ScrollView>
 
         {/* Vista principal del Dashboard */}
         <View>
@@ -506,6 +508,7 @@ useEffect(() => {
           </View>
         </View>
     
+        </ScrollView>
     
       </SafeAreaView>
     </ImageBackground>
