@@ -7,6 +7,7 @@ import {
     ImageBackground,
     Modal,
     Pressable,
+    ScrollView,
     StyleSheet,
     Text,
     TextInput,
@@ -31,12 +32,7 @@ export default function Dashboard() {
   const [gasto, setGasto] = useState<string>("");
   const [modalIngreso, setModalIngreso] = useState<boolean>(false);
 
-  const datasection = [
-    {
-      title: "gastos",
-      data: ["Vivienda", "salud", "ocio"],
-    },
-  ];
+
   
   //Definir colores para la grafica
   //PieChart solo entiende el color y el valor, aqui se define fijamente los valores de color por categoria
@@ -46,6 +42,9 @@ export default function Dashboard() {
     servicios: '#3E9BA8',
     salud: '#E7B448',
     ocio: '#D8664F',
+    transporte: '#FB6C00',
+    renta:'#403D88', 
+    
     otros: '#8A94A6', 
   };
   //Este es el value que entiende PieChart para tomar los datos de la grafica 
@@ -275,6 +274,20 @@ useEffect(() => {
                 >
                   <Text style={styles.modalButtonText}>Otros </Text>
                 </Pressable>
+                <Pressable onPress={()=> setSelected("transferencia")}
+                  style={[
+                    styles.modalButtonList,
+                    selected === "transferencia" && styles.modalButtonListPressable,
+                  ]}>
+                  <Text> Transferencia</Text>
+                </Pressable>
+                <Pressable onPress={()=> setSelected("donacion")}
+                  style={[
+                    styles.modalButtonList,
+                    selected === "donacion" && styles.modalButtonListPressable,
+                  ]}>
+                  <Text> Donación</Text>
+                </Pressable>
               </View>
               <View style={styles.modalContentButtons}>
                 <Pressable
@@ -368,16 +381,33 @@ useEffect(() => {
                 >
                   <Text style={styles.modalButtonText}>Otros</Text>
                 </Pressable>
+                <Pressable 
+                  onPress={()=> setSelected("transporte")}
+                  style={[styles.modalButtonList, 
+                    selected === "transporte" && styles.modalButtonListPressable,]
+                  }
+                >
+                  <Text>Transporte</Text>
+                </Pressable>
+
+                <Pressable
+                  onPress={()=> setSelected("renta")}
+                  style={[styles.modalButtonList, selected === "renta" && styles.modalButtonListPressable]}
+                >
+                  <Text> Renta</Text>
+                </Pressable>
+
+             
               </View>
 
               <Pressable
-                style={styles.modalButton}
+                style={styles.modalButtonGasto}
                 onPress={handleGasto}
               >
                 <Text>Añadir gasto</Text>
               </Pressable>
               <Pressable
-                style={styles.modalButton}
+                style={styles.modalButtonGasto}
                 onPress={() => {
                   setModalGasto(false);
                 }}
@@ -387,7 +417,8 @@ useEffect(() => {
             </View>
           </View>
         </Modal>
-
+        <ScrollView>
+          
         {/* Vista principal del Dashboard */}
         <View>
           <Text style={styles.title}>Bienvenido!</Text>
@@ -505,6 +536,7 @@ useEffect(() => {
               />
           </View>
         </View>
+        </ScrollView>
     
     
       </SafeAreaView>
@@ -591,13 +623,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     width: "90%",
+    height:"90%",
     backgroundColor: "#ffffff",
     padding: 35,
     borderRadius: 20,
+
   },
   modalContentButtons: {
-    margin: 3,
-    padding: 3,
+    margin: 10,
+    padding: 10,
   },
   modalTextTitle: {
     fontSize: 20,
@@ -615,9 +649,9 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   modalList: {
-    padding: 6,
+    padding: 16,
     width: 250,
-    height: 130,
+ 
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
@@ -632,15 +666,40 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     minWidth: 120,
     alignItems: 'center',
+    flexDirection:"column"
+    
+  },
+    modalButtonGasto: {
+    margin: 20,
+    padding: 5,
+    alignSelf: "center",
+    borderWidth: 1,
+    borderColor: "#000000",
+    borderRadius: 10,
+    minWidth: 120,
+    alignItems: 'center',
+    flexDirection:"column"
+    
   },
   modalButtonList: {
     padding: 5,
-    width: "40%",
+    width: "47%",
     borderWidth: 1,
     borderColor: "black",
     borderRadius: 5,
     margin: 3,
     alignItems: "center",
+  },
+  
+  modalButtonListGasto: {
+    padding: 10,
+    width: "45%",
+    borderWidth: 1,
+    borderColor: "black",
+    borderRadius: 5,
+    margin: 0,
+    alignItems: "flex-start",
+    justifyContent:"flex-start"
   },
   modalButtonText: {
     textAlign: 'center',
