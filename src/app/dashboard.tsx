@@ -1,4 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
 import { useEffect, useState } from "react";
 import {
     Alert,
@@ -20,7 +22,6 @@ import regIngreso from '../services/dashboardIngreso';
 import movimientos from '../services/dashboardMovimientos';
 import getSaldo from '../services/dashboardSaldo';
 import gastosPorCategoria from '../services/gastos-categoria';
-
 
 export default function Dashboard() {
   const [id, setId] = useState("");
@@ -212,6 +213,76 @@ useEffect(() => {
     setSelected(""); 
     setModalGasto(true);
   };
+
+
+  //Funcion para exportar datos
+  async function ExportDatos() {
+  try {
+    // Construimos las filas de la tabla de gastos por categoría
+    const filasGastos = gastosData.map(item => `
+      <tr>
+        <td>${item.label.charAt(0).toUpperCase() + item.label.slice(1)}</td>
+        <td>${item.text}</td>
+      </tr>
+    `).join('');
+
+    // Construimos las filas de la tabla de movimientos
+    const filasMovs = movs.map((item: any) => `
+      <tr>
+        <td>${item.concepto}</td>
+        <td>${item.categoria}</td>
+        <td>$ ${item.monto}</td>
+      </tr>
+    `).join('');
+
+    const html = `
+      <html>
+        <head>
+          <style>
+            body { font-family: Helvetica; padding: 20px; color: #222; }
+            h1 { color: #05386b; margin-bottom: 5px; }
+            h2 { color: #05386b; margin-top: 30px; }
+            .saldo { font-size: 22px; font-weight: bold; margin-bottom: 20px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 14px; }
+            th { background-color: #05386b; color: white; }
+          </style>
+        </head>
+        <body>
+          <h1>Reporte de ${name}</h1>
+          <div class="saldo">Saldo disponible: $ ${Number(saldo).toFixed(2)}</div>
+
+          <h2>Gastos por categoría</h2>
+          <table>
+            <tr><th>Categoría</th><th>Porcentaje</th></tr>
+            ${filasGastos || '<tr><td colspan="2">Sin gastos registrados</td></tr>'}
+          </table>
+
+          <h2>Últimas transacciones</h2>
+          <table>
+            <tr><th>Concepto</th><th>Categoría</th><th>Monto</th></tr>
+            ${filasMovs || '<tr><td colspan="3">Sin movimientos</td></tr>'}
+          </table>
+        </body>
+      </html>
+    `;
+
+    const { uri } = await Print.printToFileAsync({ html });
+
+    if (await Sharing.isAvailableAsync()) {
+      await Sharing.shareAsync(uri, {
+        mimeType: 'application/pdf',
+        dialogTitle: 'Exportar reporte',
+        UTI: 'com.adobe.pdf',
+      });
+    } else {
+      Alert.alert('Error', 'No se puede compartir el archivo en este dispositivo.');
+    }
+  } catch (error) {
+    console.error('Error al exportar PDF:', error);
+    Alert.alert('Error', 'Ocurrió un problema al generar el PDF.');
+  }
+}
 
   return (
     <ImageBackground  source={require("../assets/images/background.png")}
@@ -470,7 +541,17 @@ useEffect(() => {
                 Gasto
               </Text>
             </Pressable>
+          
           </View>
+        
+        <View style={styles.PressableSectionDoc}>
+            <Pressable style={styles.pressableButtonDoc} onPress={ExportDatos}>
+              <Image source={require("../assets/images/doc.png")}
+                style={{width:25, height:25, marginRight:10}}
+              />
+              <Text style={{fontSize:20, color:"#ffff", textAlign:"center"}}>Exportar datos</Text>
+            </Pressable>
+        </View>
 
          <View style={styles.gastossection}>
             <Text style={styles.subtitle}>Gasto por categoria</Text>
@@ -589,10 +670,18 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   PressablesSection: {
-    padding: 3,
-    margin: 1,
+    padding: 5,
+    margin: 10,
     justifyContent: "space-between",
     flexDirection: "row",
+  },
+  PressableSectionDoc:{
+    padding:5,
+    margin:10,
+    justifyContent:"center",
+    flexDirection:"column",
+    alignSelf:"center",
+    textAlign:"center"
   },
   pressableButton: {
     padding: 3,
@@ -601,7 +690,18 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: "#0000005a",
     width: 150,
-    height: 30,
+    height: 35,
+    justifyContent: "center",
+    flexDirection: "row",
+  },
+  pressableButtonDoc:{
+    padding: 3,
+    marginRight: 1,
+    borderColor: "#000000",
+    borderRadius: 10,
+    backgroundColor: "#0000005a",
+    width: 200,
+    height: 35,
     justifyContent: "center",
     flexDirection: "row",
   },
