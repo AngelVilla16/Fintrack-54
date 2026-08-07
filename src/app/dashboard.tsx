@@ -13,6 +13,7 @@ import {
     StyleSheet,
     Text,
     TextInput,
+    useWindowDimensions,
     View
 } from "react-native";
 import { PieChart } from 'react-native-gifted-charts';
@@ -33,8 +34,13 @@ export default function Dashboard() {
   const [gasto, setGasto] = useState<string>("");
   const [modalIngreso, setModalIngreso] = useState<boolean>(false);
 
+  // Dimensiones reales del dispositivo, para adaptar tamaños en vez de usar valores fijos
+  const { width, height } = useWindowDimensions();
+  const isSmallDevice = width < 360;
+  // Radio de la gráfica de pastel proporcional al ancho de pantalla, con tope máximo
+  const pieRadius = Math.min(width * 0.22, 90);
+  const pieInnerRadius = pieRadius * 0.6;
 
-  
   //Definir colores para la grafica
   //PieChart solo entiende el color y el valor, aqui se define fijamente los valores de color por categoria
   const COLORES_CATEGORIA: Record<string, string> ={
@@ -284,6 +290,55 @@ useEffect(() => {
   }
 }
 
+  // Estilos que dependen del tamaño de pantalla se calculan aquí, dentro del componente,
+  // para poder usar useWindowDimensions y así adaptarse a cada dispositivo.
+  const dynamicStyles = StyleSheet.create({
+    saldosection: {
+      padding: isSmallDevice ? 16 : 22,
+      margin: 10,
+      backgroundColor: "#0000009e",
+      flexDirection: "row",
+      alignItems: "center",
+      width: "92%",
+      maxWidth: 500,
+      alignSelf: "center",
+      minHeight: 100,
+      borderRadius: 15,
+    },
+    pressableButton: {
+      padding: 3,
+      borderColor: "#000000",
+      borderRadius: 10,
+      backgroundColor: "#0000005a",
+      width: "47%",
+      maxWidth: 220,
+      minHeight: 40,
+      justifyContent: "center",
+      alignItems: "center",
+      flexDirection: "row",
+    },
+    pressableButtonDoc: {
+      padding: 3,
+      borderColor: "#000000",
+      borderRadius: 10,
+      backgroundColor: "#0000005a",
+      width: "70%",
+      maxWidth: 260,
+      minHeight: 40,
+      justifyContent: "center",
+      alignItems: "center",
+      flexDirection: "row",
+    },
+    modalList: {
+      padding: isSmallDevice ? 8 : 16,
+      width: "100%",
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+      flexWrap: "wrap",
+    },
+  });
+
   return (
     <ImageBackground  source={require("../assets/images/background.png")}
       style={styles.Background}
@@ -293,87 +348,93 @@ useEffect(() => {
         <Modal animationType="fade" transparent={true} visible={modalIngreso}>
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalTextTitle}>Registrar nuevo ingreso</Text>
+              <ScrollView
+                style={{ width: "100%" }}
+                contentContainerStyle={{ alignItems: "center" }}
+                showsVerticalScrollIndicator={false}
+              >
+                <Text style={styles.modalTextTitle}>Registrar nuevo ingreso</Text>
 
-              <TextInput
-                placeholder="$ 0.00"
-                value={ingreso}
-                onChangeText={setIngreso}
-                keyboardType="numeric"
-                style={styles.modalInput}
-              />
-              <Text style={styles.modalTextTitle}>
-                Seleccione tipo de ingreso
-              </Text>
-              <View style={styles.modalList}>
-                <Pressable
-                  onPress={() => setSelected("nomina")}
-                  style={[
-                    styles.modalButtonList,
-                    selected === "nomina" && styles.modalButtonListPressable,
-                  ]}
-                >
-                  <Text style={styles.modalButtonText}>Nómina</Text>
-                </Pressable>
+                <TextInput
+                  placeholder="$ 0.00"
+                  value={ingreso}
+                  onChangeText={setIngreso}
+                  keyboardType="numeric"
+                  style={styles.modalInput}
+                />
+                <Text style={styles.modalTextTitle}>
+                  Seleccione tipo de ingreso
+                </Text>
+                <View style={dynamicStyles.modalList}>
+                  <Pressable
+                    onPress={() => setSelected("nomina")}
+                    style={[
+                      styles.modalButtonList,
+                      selected === "nomina" && styles.modalButtonListPressable,
+                    ]}
+                  >
+                    <Text style={styles.modalButtonText}>Nómina</Text>
+                  </Pressable>
 
-                <Pressable
-                  onPress={() => setSelected("freelance")}
-                  style={[
-                    styles.modalButtonList,
-                    selected === "freelance" && styles.modalButtonListPressable,
-                  ]}
-                >
-                  <Text style={styles.modalButtonText}>Freelance</Text>
-                </Pressable>
+                  <Pressable
+                    onPress={() => setSelected("freelance")}
+                    style={[
+                      styles.modalButtonList,
+                      selected === "freelance" && styles.modalButtonListPressable,
+                    ]}
+                  >
+                    <Text style={styles.modalButtonText}>Freelance</Text>
+                  </Pressable>
 
-                <Pressable
-                  onPress={() => setSelected("inversion")}
-                  style={[
-                    styles.modalButtonList,
-                    selected === "inversion" && styles.modalButtonListPressable,
-                  ]}
-                >
-                  <Text style={styles.modalButtonText}>Inversión</Text>
-                </Pressable>
+                  <Pressable
+                    onPress={() => setSelected("inversion")}
+                    style={[
+                      styles.modalButtonList,
+                      selected === "inversion" && styles.modalButtonListPressable,
+                    ]}
+                  >
+                    <Text style={styles.modalButtonText}>Inversión</Text>
+                  </Pressable>
 
-                <Pressable
-                  onPress={() => setSelected("otros")}
-                  style={[
-                    styles.modalButtonList,
-                    selected === "otros" && styles.modalButtonListPressable,
-                  ]}
-                >
-                  <Text style={styles.modalButtonText}>Otros </Text>
-                </Pressable>
-                <Pressable onPress={()=> setSelected("transferencia")}
-                  style={[
-                    styles.modalButtonList,
-                    selected === "transferencia" && styles.modalButtonListPressable,
-                  ]}>
-                  <Text> Transferencia</Text>
-                </Pressable>
-                <Pressable onPress={()=> setSelected("donacion")}
-                  style={[
-                    styles.modalButtonList,
-                    selected === "donacion" && styles.modalButtonListPressable,
-                  ]}>
-                  <Text> Donación</Text>
-                </Pressable>
-              </View>
-              <View style={styles.modalContentButtons}>
-                <Pressable
-                  style={styles.modalButton}
-                  onPress={handleIngreso}
-                >
-                  <Text>Añadir Ingreso</Text>
-                </Pressable>
-                <Pressable
-                  style={styles.modalButton}
-                  onPress={() => { setModalIngreso(false); }}
-                >
-                  <Text>Cancelar</Text>
-                </Pressable>
-              </View>
+                  <Pressable
+                    onPress={() => setSelected("otros")}
+                    style={[
+                      styles.modalButtonList,
+                      selected === "otros" && styles.modalButtonListPressable,
+                    ]}
+                  >
+                    <Text style={styles.modalButtonText}>Otros </Text>
+                  </Pressable>
+                  <Pressable onPress={()=> setSelected("transferencia")}
+                    style={[
+                      styles.modalButtonList,
+                      selected === "transferencia" && styles.modalButtonListPressable,
+                    ]}>
+                    <Text style={styles.modalButtonText}>Transferencia</Text>
+                  </Pressable>
+                  <Pressable onPress={()=> setSelected("donacion")}
+                    style={[
+                      styles.modalButtonList,
+                      selected === "donacion" && styles.modalButtonListPressable,
+                    ]}>
+                    <Text style={styles.modalButtonText}>Donación</Text>
+                  </Pressable>
+                </View>
+                <View style={styles.modalContentButtons}>
+                  <Pressable
+                    style={styles.modalButton}
+                    onPress={handleIngreso}
+                  >
+                    <Text>Añadir Ingreso</Text>
+                  </Pressable>
+                  <Pressable
+                    style={styles.modalButton}
+                    onPress={() => { setModalIngreso(false); }}
+                  >
+                    <Text>Cancelar</Text>
+                  </Pressable>
+                </View>
+              </ScrollView>
             </View>
           </View>
         </Modal>
@@ -382,109 +443,115 @@ useEffect(() => {
         <Modal animationType="slide" transparent={true} visible={modalGasto}>
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalTextTitle}>Registrar nuevo gasto</Text>
-
-              <TextInput
-                placeholder="$ 0.00"
-                value={gasto}
-                onChangeText={setGasto}
-                keyboardType="numeric"
-                style={styles.modalInput}
-              />
-              <Text style={styles.modalTextTitle}>
-                Seleccione tipo de gasto
-              </Text>
-              <View style={styles.modalList}>
-                <Pressable
-                  onPress={() => setSelected("comida")}
-                  style={[
-                    styles.modalButtonList,
-                    selected === "comida" && styles.modalButtonListPressable,
-                  ]}
-                >
-                  <Text style={styles.modalButtonText}>Comida</Text>
-                </Pressable>
-
-                <Pressable
-                  onPress={() => setSelected("vivienda")}
-                  style={[
-                    styles.modalButtonList,
-                    selected === "vivienda" && styles.modalButtonListPressable,
-                  ]}
-                >
-                  <Text style={styles.modalButtonText}>Vivienda</Text>
-                </Pressable>
-
-                <Pressable
-                  onPress={() => setSelected("servicios")}
-                  style={[
-                    styles.modalButtonList,
-                    selected === "servicios" && styles.modalButtonListPressable,
-                  ]}
-                >
-                  <Text style={styles.modalButtonText}>Servicios</Text>
-                </Pressable>
-
-                <Pressable
-                  onPress={() => setSelected("salud")}
-                  style={[
-                    styles.modalButtonList,
-                    selected === "salud" && styles.modalButtonListPressable,
-                  ]}
-                >
-                  <Text style={styles.modalButtonText}>Salud</Text>
-                </Pressable>
-                <Pressable
-                  onPress={() => setSelected("ocio")}
-                  style={[
-                    styles.modalButtonList,
-                    selected === "ocio" && styles.modalButtonListPressable,
-                  ]}
-                >
-                  <Text style={styles.modalButtonText}>Ocio</Text>
-                </Pressable>
-                <Pressable
-                  onPress={() => setSelected("otros")}
-                  style={[
-                    styles.modalButtonList,
-                    selected === "otros" && styles.modalButtonListPressable,
-                  ]}
-                >
-                  <Text style={styles.modalButtonText}>Otros</Text>
-                </Pressable>
-                <Pressable 
-                  onPress={()=> setSelected("transporte")}
-                  style={[styles.modalButtonList, 
-                    selected === "transporte" && styles.modalButtonListPressable,]
-                  }
-                >
-                  <Text>Transporte</Text>
-                </Pressable>
-
-                <Pressable
-                  onPress={()=> setSelected("renta")}
-                  style={[styles.modalButtonList, selected === "renta" && styles.modalButtonListPressable]}
-                >
-                  <Text> Renta</Text>
-                </Pressable>
-
-             
-              </View>
-
-              <Pressable
-                style={styles.modalButtonGasto}
-                onPress={handleGasto}
+              <ScrollView
+                style={{ width: "100%" }}
+                contentContainerStyle={{ alignItems: "center" }}
+                showsVerticalScrollIndicator={false}
               >
-                <Text>Añadir gasto</Text>
-              </Pressable>
-              <Pressable
-                style={styles.modalButtonGasto}
-                onPress={() => {
-                  setModalGasto(false);
-                }}
-              >
-                <Text>Cancelar</Text>
-              </Pressable>
+                <Text style={styles.modalTextTitle}>Registrar nuevo gasto</Text>
+
+                <TextInput
+                  placeholder="$ 0.00"
+                  value={gasto}
+                  onChangeText={setGasto}
+                  keyboardType="numeric"
+                  style={styles.modalInput}
+                />
+                <Text style={styles.modalTextTitle}>
+                  Seleccione tipo de gasto
+                </Text>
+                <View style={dynamicStyles.modalList}>
+                  <Pressable
+                    onPress={() => setSelected("comida")}
+                    style={[
+                      styles.modalButtonList,
+                      selected === "comida" && styles.modalButtonListPressable,
+                    ]}
+                  >
+                    <Text style={styles.modalButtonText}>Comida</Text>
+                  </Pressable>
+
+                  <Pressable
+                    onPress={() => setSelected("vivienda")}
+                    style={[
+                      styles.modalButtonList,
+                      selected === "vivienda" && styles.modalButtonListPressable,
+                    ]}
+                  >
+                    <Text style={styles.modalButtonText}>Vivienda</Text>
+                  </Pressable>
+
+                  <Pressable
+                    onPress={() => setSelected("servicios")}
+                    style={[
+                      styles.modalButtonList,
+                      selected === "servicios" && styles.modalButtonListPressable,
+                    ]}
+                  >
+                    <Text style={styles.modalButtonText}>Servicios</Text>
+                  </Pressable>
+
+                  <Pressable
+                    onPress={() => setSelected("salud")}
+                    style={[
+                      styles.modalButtonList,
+                      selected === "salud" && styles.modalButtonListPressable,
+                    ]}
+                  >
+                    <Text style={styles.modalButtonText}>Salud</Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={() => setSelected("ocio")}
+                    style={[
+                      styles.modalButtonList,
+                      selected === "ocio" && styles.modalButtonListPressable,
+                    ]}
+                  >
+                    <Text style={styles.modalButtonText}>Ocio</Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={() => setSelected("otros")}
+                    style={[
+                      styles.modalButtonList,
+                      selected === "otros" && styles.modalButtonListPressable,
+                    ]}
+                  >
+                    <Text style={styles.modalButtonText}>Otros</Text>
+                  </Pressable>
+                  <Pressable 
+                    onPress={()=> setSelected("transporte")}
+                    style={[styles.modalButtonList, 
+                      selected === "transporte" && styles.modalButtonListPressable,]
+                    }
+                  >
+                    <Text style={styles.modalButtonText}>Transporte</Text>
+                  </Pressable>
+
+                  <Pressable
+                    onPress={()=> setSelected("renta")}
+                    style={[styles.modalButtonList, selected === "renta" && styles.modalButtonListPressable]}
+                  >
+                    <Text style={styles.modalButtonText}>Renta</Text>
+                  </Pressable>
+
+               
+                </View>
+
+                <Pressable
+                  style={styles.modalButtonGasto}
+                  onPress={handleGasto}
+                >
+                  <Text>Añadir gasto</Text>
+                </Pressable>
+                <Pressable
+                  style={styles.modalButtonGasto}
+                  onPress={() => {
+                    setModalGasto(false);
+                  }}
+                >
+                  <Text>Cancelar</Text>
+                </Pressable>
+              </ScrollView>
             </View>
           </View>
         </Modal>
@@ -496,7 +563,7 @@ useEffect(() => {
           <Text style={styles.subtitle}>{name}</Text>
           
           {/* Sección de saldo disponible */}
-          <View style={styles.saldosection}>
+          <View style={dynamicStyles.saldosection}>
             <View>
               <Image
                 source={require("../assets/images/creditcard.png")}
@@ -505,7 +572,11 @@ useEffect(() => {
             </View>
             <View style={styles.titulosectionsaldo}>
               <Text style={styles.text}>Saldo disponible</Text>
-              <Text style={styles.saldo}>
+              <Text
+                style={styles.saldo}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+              >
                 $ <Text>{Number(saldo).toFixed(2)}</Text>
               </Text>
             </View>
@@ -514,7 +585,7 @@ useEffect(() => {
           {/* Sección de botones */}
           <View style={styles.PressablesSection}>
             <Pressable
-              style={styles.pressableButton}
+              style={dynamicStyles.pressableButton}
               onPress={abrirModalIngreso}
             >
               <Image
@@ -522,13 +593,13 @@ useEffect(() => {
                 style={{ width: 25, height: 25, marginRight: 10 }}
               />
               <Text
-                style={{ fontSize: 20, color: "#ffff", textAlign: "center" }}
+                style={{ fontSize: isSmallDevice ? 16 : 20, color: "#ffff", textAlign: "center" }}
               >
                 Ingreso
               </Text>
             </Pressable>
             <Pressable
-              style={styles.pressableButton}
+              style={dynamicStyles.pressableButton}
               onPress={abrirModalGasto}
             >
               <Image
@@ -536,7 +607,7 @@ useEffect(() => {
                 style={{ width: 25, height: 25, marginRight: 10 }}
               />
               <Text
-                style={{ fontSize: 20, color: "#ffff", textAlign: "center" }}
+                style={{ fontSize: isSmallDevice ? 16 : 20, color: "#ffff", textAlign: "center" }}
               >
                 Gasto
               </Text>
@@ -545,11 +616,11 @@ useEffect(() => {
           </View>
         
         <View style={styles.PressableSectionDoc}>
-            <Pressable style={styles.pressableButtonDoc} onPress={ExportDatos}>
+            <Pressable style={dynamicStyles.pressableButtonDoc} onPress={ExportDatos}>
               <Image source={require("../assets/images/doc.png")}
                 style={{width:25, height:25, marginRight:10}}
               />
-              <Text style={{fontSize:20, color:"#ffff", textAlign:"center"}}>Exportar datos</Text>
+              <Text style={{fontSize: isSmallDevice ? 16 : 20, color:"#ffff", textAlign:"center"}}>Exportar datos</Text>
             </Pressable>
         </View>
 
@@ -562,8 +633,8 @@ useEffect(() => {
                   <PieChart
                   data={gastosData}
                   donut
-                  radius={80}
-                  innerRadius={50}
+                  radius={pieRadius}
+                  innerRadius={pieInnerRadius}
                   showText
                   textColor="#fff"
                   textSize={12}
@@ -649,61 +720,31 @@ const styles = StyleSheet.create({
     color: "#ffff",
     fontSize: 20,
   },
-  saldosection: {
-    padding: 25,
-    margin: 10,
-    backgroundColor: "#0000009e",
-    flexDirection: "row",
-    width: 355,
-    height: 100,
-    borderRadius: 15,
-  },
   titulosectionsaldo: {
+    flex: 1,
     justifyContent: "flex-start",
     alignContent: "flex-start",
     padding: 10,
-    alignSelf: "flex-start",
+    alignSelf: "center",
   },
   saldo: {
     fontSize: 28,
     color: "#ffff",
-    textAlign: "center",
+    textAlign: "left",
   },
   PressablesSection: {
     padding: 5,
     margin: 10,
     justifyContent: "space-between",
     flexDirection: "row",
+    flexWrap: "wrap",
   },
   PressableSectionDoc:{
     padding:5,
     margin:10,
     justifyContent:"center",
     flexDirection:"column",
-    alignSelf:"center",
-    textAlign:"center"
-  },
-  pressableButton: {
-    padding: 3,
-    marginRight: 1,
-    borderColor: "#000000",
-    borderRadius: 10,
-    backgroundColor: "#0000005a",
-    width: 150,
-    height: 35,
-    justifyContent: "center",
-    flexDirection: "row",
-  },
-  pressableButtonDoc:{
-    padding: 3,
-    marginRight: 1,
-    borderColor: "#000000",
-    borderRadius: 10,
-    backgroundColor: "#0000005a",
-    width: 200,
-    height: 35,
-    justifyContent: "center",
-    flexDirection: "row",
+    alignItems: "center",
   },
   gastossection: {
     padding: 10,
@@ -723,9 +764,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     width: "90%",
-    height:"90%",
+    maxHeight: "85%",
     backgroundColor: "#ffffff",
-    padding: 35,
+    paddingVertical: 25,
+    paddingHorizontal: 20,
     borderRadius: 20,
 
   },
@@ -744,18 +786,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "black",
     borderRadius: 10,
-    width: "50%",
+    width: "60%",
     height: 40,
     textAlign: "center",
-  },
-  modalList: {
-    padding: 16,
-    width: 250,
- 
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    flexWrap: "wrap",
   },
   modalButton: {
     margin: 5,
@@ -789,17 +822,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     margin: 3,
     alignItems: "center",
-  },
-  
-  modalButtonListGasto: {
-    padding: 10,
-    width: "45%",
-    borderWidth: 1,
-    borderColor: "black",
-    borderRadius: 5,
-    margin: 0,
-    alignItems: "flex-start",
-    justifyContent:"flex-start"
   },
   modalButtonText: {
     textAlign: 'center',

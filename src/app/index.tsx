@@ -1,7 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRouter } from "expo-router";
-import { useState } from "react";
+import { router, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
+    ActivityIndicator,
     Alert,
     ImageBackground,
     KeyboardAvoidingView,
@@ -23,6 +24,7 @@ export default function HomeScreen() {
   const [password, setPassword] = useState<string>("");
   const [isEnable, setIsEnable] = useState<boolean>(false);
   const [secure, setSecure] = useState<boolean>(true);
+  const [verificar, setVerificar] = useState<boolean>(true);
 
   const toggleSwitch = () => {
     const nextState = !isEnable;
@@ -47,6 +49,34 @@ export default function HomeScreen() {
       const mensajeError = error.message || "Ocurrió un problema inesperado.";
       Alert.alert("Error al iniciar sesión", mensajeError);
     }
+  }
+
+  //Verificar inicio de sesión y comprobar sesión iniciada
+  useEffect(()=>{
+    async function verificarLogin(){
+      try{
+        const idGuardado = await AsyncStorage.getItem('id_usuario');
+
+        if(idGuardado){
+          router.replace('/dashboard');
+        }
+      }
+      catch(e){
+        console.error("Error al validar tu sesión");
+      }
+      finally{
+        setVerificar(false);
+      }
+      
+    }
+    verificarLogin();
+  },[]);
+  if(verificar){
+    return(
+      <View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
+        <ActivityIndicator size="large" color="#00a465"/>
+      </View>
+    );
   }
   return (
     <KeyboardAvoidingView
