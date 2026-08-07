@@ -1,22 +1,22 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { router, useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    ImageBackground,
-    KeyboardAvoidingView,
-    Platform,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Switch,
-    Text,
-    TextInput,
-    View,
+  ActivityIndicator,
+  Alert,
+  ImageBackground,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Login from '../services/login';
+import Login from "../services/login";
 
 export default function HomeScreen() {
   const route = useRouter();
@@ -32,49 +32,44 @@ export default function HomeScreen() {
     setSecure(!nextState); // Si nextState es true, secure pasa a false, y viceversa
   };
 
-  const handleLogin = async ()=>{
-
-    if(!user || !password){
+  const handleLogin = async () => {
+    if (!user || !password) {
       Alert.alert("Favor de llenar todos los campos!");
       return;
     }
-    try{
-      const data = await Login({user, password});
+    try {
+      const data = await Login({ user, password });
       const id = data.usuario.id;
-      await AsyncStorage.setItem('id_usuario', String(id));
-      await AsyncStorage.setItem('nombre_usuario', data.usuario.nombre);
+      await AsyncStorage.setItem("id_usuario", String(id));
+      await AsyncStorage.setItem("nombre_usuario", data.usuario.nombre);
       route.push("/dashboard");
-    }
-    catch(error:any){
+    } catch (error: any) {
       const mensajeError = error.message || "Ocurrió un problema inesperado.";
       Alert.alert("Error al iniciar sesión", mensajeError);
     }
-  }
+  };
 
   //Verificar inicio de sesión y comprobar sesión iniciada
-  useEffect(()=>{
-    async function verificarLogin(){
-      try{
-        const idGuardado = await AsyncStorage.getItem('id_usuario');
+  useEffect(() => {
+    async function verificarLogin() {
+      try {
+        const idGuardado = await AsyncStorage.getItem("id_usuario");
 
-        if(idGuardado){
-          router.replace('/dashboard');
+        if (idGuardado) {
+          route.replace("/dashboard");
         }
-      }
-      catch(e){
+      } catch (e) {
         console.error("Error al validar tu sesión");
-      }
-      finally{
+      } finally {
         setVerificar(false);
       }
-      
     }
     verificarLogin();
-  },[]);
-  if(verificar){
-    return(
-      <View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
-        <ActivityIndicator size="large" color="#00a465"/>
+  }, []);
+  if (verificar) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#00a465" />
       </View>
     );
   }
@@ -114,7 +109,6 @@ export default function HomeScreen() {
                 autoCapitalize="none"
               />
               <View style={styles.passSection}>
-
                 <Text style={styles.labeltext}>Contraseña:</Text>
                 <TextInput
                   style={styles.forminput}
@@ -125,15 +119,22 @@ export default function HomeScreen() {
                   autoCapitalize="none"
                 />
                 <Text style={styles.labeltext}> Mostrar contraseña:</Text>
-                <Switch onValueChange={toggleSwitch}
-                    trackColor={{false: '#767577', true: '#58ff8a'}}
-                    thumbColor={isEnable ? '#006839' : '#f4f3f4'}
-                    value={isEnable}
+                <Switch
+                  onValueChange={toggleSwitch}
+                  trackColor={{ false: "#767577", true: "#58ff8a" }}
+                  thumbColor={isEnable ? "#006839" : "#f4f3f4"}
+                  value={isEnable}
                 />
               </View>
               <Pressable onPress={() => route.push("/register")}>
                 <Text style={styles.formlinktext}>
                   ¿No estas registrado? <Text>Registrate aqui</Text>
+                </Text>
+              </Pressable>
+
+              <Pressable onPress={() => route.push("/change")}>
+                <Text style={styles.formlinktext}>
+                  ¿Olvidaste tu contraseña?
                 </Text>
               </Pressable>
 
@@ -162,7 +163,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     justifyContent: "center",
-    paddingTop: 180,
+    paddingTop: 160,
   },
 
   form: {
@@ -227,13 +228,14 @@ const styles = StyleSheet.create({
   },
   formlinktext: {
     color: "#ffff",
-    fontSize: 18,
+    fontSize: 14,
+    margin: 8,
   },
-    passSection:{
-    display:"flex",
-    flexDirection:"column",
-    margin:2,
-    padding:3,
-    alignItems:"center"
+  passSection: {
+    display: "flex",
+    flexDirection: "column",
+    margin: 2,
+    padding: 3,
+    alignItems: "center",
   },
 });
