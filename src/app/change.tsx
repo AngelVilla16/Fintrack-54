@@ -1,13 +1,38 @@
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import {
-  ImageBackground,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
+    Alert,
+    ImageBackground,
+    Pressable,
+    StyleSheet,
+    Text,
+    TextInput,
+    View
 } from "react-native";
+import { getCodigo } from '../services/restorePass';
 
 export default function Change() {
+  const [correo, setCorreo] = useState<string>("");
+  const [error, setError] = useState("");
+  const [load, setLoad] = useState<boolean>(false);
+  const route = useRouter();
+
+  const handleSendCodigo = async ()=>{
+    setLoad(true);
+    try{
+      await getCodigo(correo);
+      route.push({pathname: '/verificar', params:{correo}});
+
+    }
+    catch(err:any){
+      setError(err.message);
+      Alert.alert(err.message);
+    }
+    finally{
+      setLoad(false);
+    }
+  }
+
   return (
     <ImageBackground
       source={require("../assets/images/background.png")}
@@ -19,8 +44,8 @@ export default function Change() {
           {" "}
           Ingrese su correo:{" "}
         </Text>
-        <TextInput style={styles.forminput} autoCapitalize="none" />
-        <Pressable style={styles.btn}>
+        <TextInput value={correo} onChangeText={setCorreo} style={styles.forminput} autoCapitalize="none" />
+        <Pressable style={styles.btn} onPress={handleSendCodigo}>
           <Text
             style={{
               textAlign: "center",

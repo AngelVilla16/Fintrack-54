@@ -1,10 +1,12 @@
 import cors from "cors";
+import 'dotenv/config';
 import express from "express";
-
 import dashboard from './routes/dashboard.js';
 import login from "./routes/login.js";
 import register from "./routes/register.js";
-
+import restore from './routes/restore.js';
+import update from './routes/update.js';
+import verify from './routes/verify.js';
 
 const app = express();
 app.use(cors());
@@ -12,5 +14,8 @@ app.use(express.json());
 app.use("/api/auth", register);
 app.use("/api/auth", login);
 app.use("/api/dash", dashboard);
+app.use('/api/auth', restore);
+app.use('/api/auth', verify);
+app.use('/api/auth', update);
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor corriendo en el puerto ${PORT}`));
