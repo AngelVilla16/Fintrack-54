@@ -1,7 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
+    ActivityIndicator,
     Alert,
     ImageBackground,
     KeyboardAvoidingView,
@@ -49,29 +50,29 @@ export default function HomeScreen() {
   };
 
   //Verificar inicio de sesión y comprobar sesión iniciada
-  // useEffect(() => {
-  //   async function verificarLogin() {
-  //     try {
-  //       const idGuardado = await AsyncStorage.getItem("id_usuario");
+  useEffect(() => {
+    async function verificarLogin() {
+      try {
+        const idGuardado = await AsyncStorage.getItem("id_usuario");
 
-  //       if (idGuardado) {
-  //         route.replace("/dashboard");
-  //       }
-  //     } catch (e) {
-  //       console.error("Error al validar tu sesión");
-  //     } finally {
-  //       setVerificar(false);
-  //     }
-  //   }
-  //   verificarLogin();
-  // }, []);
-  // if (verificar) {
-  //   return (
-  //     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-  //       <ActivityIndicator size="large" color="#00a465" />
-  //     </View>
-  //   );
-  // }
+        if (idGuardado) {
+          route.replace("/dashboard");
+        }
+      } catch (e) {
+        console.error("Error al validar tu sesión");
+      } finally {
+        setVerificar(false);
+      }
+    }
+    verificarLogin();
+  }, []);
+  if (verificar) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#00a465" />
+      </View>
+    );
+  }
   return (
     <KeyboardAvoidingView
       style={styles.key}
