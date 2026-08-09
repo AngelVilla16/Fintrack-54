@@ -1,22 +1,19 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port:465,
-    secure:true,
-    auth:{
-        user:process.env.MAIL_USER,
-        pass: process.env.MAIL_PASSWORD
-    },
-    family:4,
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-
-export async function sendEmail(dest, asunto, text){
-    await transporter.sendMail({
-        from: `"Fintrack" <${process.env.MAIL_USER}>`,
+export async function sendEmail(dest, asunto, text) {
+    const { data, error } = await resend.emails.send({
+        from: 'Fintrack <onboarding@resend.dev>', // dominio de prueba, gratis, sin configuración extra
         to: dest,
         subject: asunto,
-        html: text
+        html: text,
     });
+
+    if (error) {
+        console.error('Error al enviar correo con Resend:', error);
+        throw new Error('No se pudo enviar el correo');
+    }
+
+    return data;
 }
