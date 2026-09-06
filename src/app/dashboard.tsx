@@ -3,18 +3,19 @@ import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { useEffect, useState } from "react";
 import {
-    Alert,
-    FlatList,
-    Image,
-    ImageBackground,
-    Modal,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    useWindowDimensions,
-    View
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Image,
+  ImageBackground,
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  useWindowDimensions,
+  View
 } from "react-native";
 import { PieChart } from 'react-native-gifted-charts';
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -25,6 +26,7 @@ import getSaldo from '../services/dashboardSaldo';
 import gastosPorCategoria from '../services/gastos-categoria';
 
 export default function Dashboard() {
+  const [load, setLoad] = useState(true);
   const [id, setId] = useState("");
   const [selected, setSelected] = useState<string>("");
   const [name, setName] = useState("");
@@ -114,7 +116,9 @@ useEffect(() => {
     async function fetchSaldo(){
       try{
         const data = await getSaldo(id);
+        
         setSaldo(Number(data.saldo) || 0);
+        setLoad(false); // Ocultar el modal de carga una vez que se obtiene el saldo
 
       }
       catch(error){
@@ -344,6 +348,17 @@ useEffect(() => {
       style={styles.Background}
       resizeMode="cover">
       <SafeAreaView style={styles.container}>
+      {/* Modal que muestra la carga */}
+      <Modal animationType='fade' transparent={true}  visible={load}>
+        <View style={styles.modalLoad}>
+          <View style={styles.modalContent}>
+
+            <Text style={styles.modalTextTitle}>Cargando los datos del usuario... Espere por favor</Text>
+            <ActivityIndicator size="large" color="#05386b" />
+          </View>
+        </View>
+
+      </Modal>
         {/* Modales para añadir gasto e ingreso */}
         <Modal animationType="fade" transparent={true} visible={modalIngreso}>
           <View style={styles.modalOverlay}>
@@ -756,6 +771,14 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalLoad:{
+    flex: 1,
+    width: "100%",
+    height: "100%",
     backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "center",
     alignItems: "center",
