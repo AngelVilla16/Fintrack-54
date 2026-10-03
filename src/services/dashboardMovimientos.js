@@ -10,9 +10,10 @@ export default async function movimientos(id) {
 
         if (!res.ok) {
             console.log("Error al obtener movimientos recientes.")
+            return;
         }
         return data;
     } catch (error) {
-        throw new Error(error.message);
+        console.error("Error al obtener movimientos recientes: ", error);
     }
 }

@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Print from 'expo-print';
+import { useRouter } from 'expo-router';
 import * as Sharing from 'expo-sharing';
 import { useEffect, useState } from "react";
 import {
@@ -26,6 +27,7 @@ import getSaldo from '../services/dashboardSaldo';
 import gastosPorCategoria from '../services/gastos-categoria';
 
 export default function Dashboard() {
+  const route = useRouter();
   const [load, setLoad] = useState(true);
   const [id, setId] = useState("");
   const [selected, setSelected] = useState<string>("");
@@ -35,6 +37,7 @@ export default function Dashboard() {
   const [ingreso, setIngreso] = useState<string>("");
   const [gasto, setGasto] = useState<string>("");
   const [modalIngreso, setModalIngreso] = useState<boolean>(false);
+  const [menuAbierto, setMenuAbierto] = useState<boolean>(false);
 
   // Dimensiones reales del dispositivo, para adaptar tamaños en vez de usar valores fijos
   const { width, height } = useWindowDimensions();
@@ -144,6 +147,22 @@ useEffect(() => {
     fetchMovs();
   },[id, saldo]);
 
+
+  //Funcion para cerrar la sesión del usuario xd
+  const cerrarSesion = async()=>{
+    try{
+      await AsyncStorage.removeItem("id_usuario");
+      route.replace('/');
+      
+    }
+    catch(error){
+      console.error("Error al cerrar la sesion");
+      Alert.alert("Error al cerrar la sesión");
+      return;
+    }
+
+  }
+
   // Función para calcular el saldo acorde a la operación
   const handleIngreso = async () => {
     const monto = Number(ingreso);
@@ -184,8 +203,9 @@ useEffect(() => {
     const restaGasto: number = Number(saldo) - monto;
     const tipo:string = "gasto";
 
-    if(!monto || monto<=0){
+    if(!monto || monto<=0 || monto > saldo){
       Alert.alert("Se requiere ingresar una cantidad valida");
+      return;
     }
     if (!concepto) {
       Alert.alert("Categoría requerida", "Por favor selecciona un tipo de gasto.");
@@ -215,12 +235,14 @@ useEffect(() => {
 
   // Helpers para abrir modales y limpiar la categoría anterior
   const abrirModalIngreso = () => {
-    setSelected(""); 
+    setSelected("");
+    setMenuAbierto(false);
     setModalIngreso(true);
   };
 
   const abrirModalGasto = () => {
-    setSelected(""); 
+    setSelected("");
+    setMenuAbierto(false);
     setModalGasto(true);
   };
 
@@ -570,9 +592,61 @@ useEffect(() => {
             </View>
           </View>
         </Modal>
+        {/* Menú hamburguesa en la esquina superior derecha */}
+        <View style={styles.menuContainer}>
+          <Pressable
+            style={styles.hamburgerButton}
+            onPress={() => setMenuAbierto(!menuAbierto)}
+          >
+            <Text style={styles.hamburgerText}>☰</Text>
+          </Pressable>
+
+          {menuAbierto && (
+            <View style={styles.menuDropdown}>
+              <Pressable style={styles.menuItem} onPress={abrirModalIngreso}>
+                <Image
+                  source={require("../assets/images/agregar.png")}
+                  style={{ width: 20, height: 20, marginRight: 10 }}
+                />
+                <Text style={styles.menuItemText}>Ingreso</Text>
+              </Pressable>
+              <Pressable style={styles.menuItem} onPress={abrirModalGasto}>
+                <Image
+                  source={require("../assets/images/eliminar.png")}
+                  style={{ width: 20, height: 20, marginRight: 10 }}
+                />
+                <Text style={styles.menuItemText}>Gasto</Text>
+              </Pressable>
+              <Pressable
+                style={styles.menuItem}
+                onPress={() => { setMenuAbierto(false); ExportDatos(); }}
+              >
+                <Image
+                  source={require("../assets/images/doc.png")}
+                  style={{ width: 20, height: 20, marginRight: 10 }}
+                />
+                <Text style={styles.menuItemText}>Exportar datos</Text>
+              </Pressable>
+
+              <Pressable style={styles.menuItem} onPress={cerrarSesion}>
+                <Image source={require("../assets/images/logout.png")}
+                style={{width:20, height:20, marginRight:0}}
+                />
+                <Text style={styles.menuItemText}> Cerrar Sesión</Text>
+              </Pressable>
+
+              <Pressable style={styles.menuItem}>
+                <Image source={require("../assets/images/delete.png")}
+                  style={{width:20, height:20, marginRight:0}}
+                />
+                <Text style={styles.menuItemText}>Eliminar Cuenta</Text>
+              </Pressable>
+            </View>
+          )}
+        </View>
+
         <ScrollView>
-          
-        {/* Vista principal del Dashboard */}
+
         <View>
           <Text style={styles.title}>Bienvenido!</Text>
           <Text style={styles.subtitle}>{name}</Text>
@@ -596,48 +670,6 @@ useEffect(() => {
               </Text>
             </View>
           </View>
-
-          {/* Sección de botones */}
-          <View style={styles.PressablesSection}>
-            <Pressable
-              style={dynamicStyles.pressableButton}
-              onPress={abrirModalIngreso}
-            >
-              <Image
-                source={require("../assets/images/agregar.png")}
-                style={{ width: 25, height: 25, marginRight: 10 }}
-              />
-              <Text
-                style={{ fontSize: isSmallDevice ? 16 : 20, color: "#ffff", textAlign: "center" }}
-              >
-                Ingreso
-              </Text>
-            </Pressable>
-            <Pressable
-              style={dynamicStyles.pressableButton}
-              onPress={abrirModalGasto}
-            >
-              <Image
-                source={require("../assets/images/eliminar.png")}
-                style={{ width: 25, height: 25, marginRight: 10 }}
-              />
-              <Text
-                style={{ fontSize: isSmallDevice ? 16 : 20, color: "#ffff", textAlign: "center" }}
-              >
-                Gasto
-              </Text>
-            </Pressable>
-          
-          </View>
-        
-        <View style={styles.PressableSectionDoc}>
-            <Pressable style={dynamicStyles.pressableButtonDoc} onPress={ExportDatos}>
-              <Image source={require("../assets/images/doc.png")}
-                style={{width:25, height:25, marginRight:10}}
-              />
-              <Text style={{fontSize: isSmallDevice ? 16 : 20, color:"#ffff", textAlign:"center"}}>Exportar datos</Text>
-            </Pressable>
-        </View>
 
          <View style={styles.gastossection}>
             <Text style={styles.subtitle}>Gasto por categoria</Text>
@@ -760,6 +792,40 @@ const styles = StyleSheet.create({
     justifyContent:"center",
     flexDirection:"column",
     alignItems: "center",
+  },
+  menuContainer: {
+    position: "absolute",
+    top: 10,
+    right: 20,
+    zIndex: 10,
+    alignItems: "flex-end",
+  },
+  hamburgerButton: {
+    backgroundColor: "#0000005a",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  hamburgerText: {
+    color: "#ffff",
+    fontSize: 24,
+  },
+  menuDropdown: {
+    marginTop: 8,
+    backgroundColor: "#05386b",
+    borderRadius: 10,
+    padding: 8,
+    minWidth: 180,
+  },
+  menuItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+  },
+  menuItemText: {
+    color: "#ffff",
+    fontSize: 16,
   },
   gastossection: {
     padding: 10,

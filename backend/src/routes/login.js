@@ -14,7 +14,7 @@ router.post("/login", async (req, res)=>{
         const [response] = await pool.execute(queryValidate, [user]);
 
         if(response.length===0){
-            return res.status(401).json({error: "Usuario no existente"});
+            return res.status(401).json({error: "Usuario o Contraseña incorrectos "});
         }
         
         const usuario = response[0];
@@ -23,7 +23,7 @@ router.post("/login", async (req, res)=>{
 
         if(!passwordCorrect){
             return res.status(401).json({
-                error: "Contraseña incorrecta"
+                error: "Usuario o Contraseña incorrectos "
                
             });
 
