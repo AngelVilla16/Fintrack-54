@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+/* import crypto from 'crypto';
 import express from 'express';
 import pool from '../lib/conexion.mjs';
 import { sendEmail } from '../lib/mailer.mjs';
@@ -37,3 +37,4 @@ router.post('/reset', async (req, res)=>{
 });
 
 export default router;
+*/

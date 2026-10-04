@@ -2,18 +2,19 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    ImageBackground,
-    KeyboardAvoidingView,
-    Platform,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Switch,
-    Text,
-    TextInput,
-    View
+  ActivityIndicator,
+  Alert,
+  ImageBackground,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TextInput,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Login from "../services/login";
@@ -25,7 +26,7 @@ export default function HomeScreen() {
   const [isEnable, setIsEnable] = useState<boolean>(false);
   const [secure, setSecure] = useState<boolean>(true);
   const [verificar, setVerificar] = useState<boolean>(true);
-
+  const [load, setLoad] = useState<boolean>(false);
   const toggleSwitch = () => {
     const nextState = !isEnable;
     setIsEnable(nextState);
@@ -37,13 +38,18 @@ export default function HomeScreen() {
       Alert.alert("Favor de llenar todos los campos!");
       return;
     }
+
+    setLoad(true);
+    
     try {
       const data = await Login({ user, password });
       const id = data.usuario.id;
       await AsyncStorage.setItem("id_usuario", String(id));
       await AsyncStorage.setItem("nombre_usuario", data.usuario.nombre);
+      setLoad(false);
       route.push("/dashboard");
     } catch (error: any) {
+      setLoad(false);
       const mensajeError = error.message || "Ocurrió un problema inesperado.";
       Alert.alert("Error al iniciar sesión", mensajeError);
     }
@@ -86,6 +92,14 @@ export default function HomeScreen() {
           resizeMode="cover"
         >
           <SafeAreaView style={styles.container}>
+            <Modal animationType="fade" transparent={true} visible={load}>
+               <View style={styles.modalLoad}>
+                <View style={styles.modalContent}>
+                  <Text style={styles.modalTextTitle}>Estamos trabajando para ti...</Text>
+                  <ActivityIndicator size="large" color="#00a465"/>
+                </View>
+               </View>
+            </Modal>
             <View>
               <Text style={styles.title}>Fintrack!</Text>
               <Text style={styles.subtitle}>
@@ -237,5 +251,29 @@ const styles = StyleSheet.create({
     margin: 2,
     padding: 3,
     alignItems: "center",
+  },
+   modalLoad:{
+    flex: 1,
+    width: "100%",
+    height: "100%",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    justifyContent: "center",
+    alignItems: "center",
+    width: "90%",
+    maxHeight: "85%",
+    backgroundColor: "#ffffff",
+    paddingVertical: 25,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+
+  },
+   modalTextTitle: {
+    fontSize: 20,
+    textAlign: "center",
+    margin: 3,
   },
 });

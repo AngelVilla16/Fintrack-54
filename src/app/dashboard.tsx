@@ -24,6 +24,7 @@ import regGasto from '../services/dashboardGasto';
 import regIngreso from '../services/dashboardIngreso';
 import movimientos from '../services/dashboardMovimientos';
 import getSaldo from '../services/dashboardSaldo';
+import eliminarCuenta from '../services/deleteusuario';
 import gastosPorCategoria from '../services/gastos-categoria';
 
 export default function Dashboard() {
@@ -38,6 +39,7 @@ export default function Dashboard() {
   const [gasto, setGasto] = useState<string>("");
   const [modalIngreso, setModalIngreso] = useState<boolean>(false);
   const [menuAbierto, setMenuAbierto] = useState<boolean>(false);
+  const [modalEliminar, setModalEliminar] = useState<boolean>(false);
 
   // Dimensiones reales del dispositivo, para adaptar tamaños en vez de usar valores fijos
   const { width, height } = useWindowDimensions();
@@ -162,7 +164,29 @@ useEffect(() => {
     }
 
   }
+  //Funcion para que ya borres la cuenta we
+  const handleDeleteUser = async ()=>{
+    setModalEliminar(false);
+    try{
+      const res:any= await eliminarCuenta(id);
+      if(res.ok){
+        route.push("/")
+      }else{
+        Alert.alert("Error al eliminar cuenta");
+      }
+    }
+    catch(error){
+      console.error("Error al eliminar la cuenta: ", error);
+      Alert.alert("Error al eliminar cuenta");
+    }
+  }
 
+  // Abre el modal de confirmación antes de eliminar la cuenta
+  const abrirModalEliminar = () => {
+    setModalEliminar(true);
+  }
+  
+  
   // Función para calcular el saldo acorde a la operación
   const handleIngreso = async () => {
     const monto = Number(ingreso);
@@ -592,6 +616,31 @@ useEffect(() => {
             </View>
           </View>
         </Modal>
+
+        {/* Modal de confirmación para eliminar la cuenta */}
+        <Modal animationType="fade" transparent={true} visible={modalEliminar}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTextTitle}>
+                ¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.
+              </Text>
+              <View style={styles.modalContentButtons}>
+                <Pressable
+                  style={styles.modalButton}
+                  onPress={handleDeleteUser}
+                >
+                  <Text>Sí, eliminar</Text>
+                </Pressable>
+                <Pressable
+                  style={styles.modalButton}
+                  onPress={() => setModalEliminar(false)}
+                >
+                  <Text>Cancelar</Text>
+                </Pressable>
+              </View>
+            </View>
+          </View>
+        </Modal>
         {/* Menú hamburguesa en la esquina superior derecha */}
         <View style={styles.menuContainer}>
           <Pressable
@@ -635,7 +684,7 @@ useEffect(() => {
                 <Text style={styles.menuItemText}> Cerrar Sesión</Text>
               </Pressable>
 
-              <Pressable style={styles.menuItem}>
+              <Pressable style={styles.menuItem} onPress={abrirModalEliminar}>
                 <Image source={require("../assets/images/delete.png")}
                   style={{width:20, height:20, marginRight:0}}
                 />
