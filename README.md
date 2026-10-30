@@ -69,6 +69,10 @@ Go to the backend folder
 - [ ] Add Statistics and Graphics for Expenses 
 - [ ] Add View the recent moves
 
+## License
+
+This project is licensed under the MIT License - see the [license.txt](license.txt) file for details.
+
 ## Project Structure
 ```bash
 Fintrack-54/

@@ -46,6 +46,9 @@ export default function HomeScreen() {
       const id = data.usuario.id;
       await AsyncStorage.setItem("id_usuario", String(id));
       await AsyncStorage.setItem("nombre_usuario", data.usuario.nombre);
+      if (data.token) {
+        await AsyncStorage.setItem("token", data.token);
+      }
       setLoad(false);
       route.push("/dashboard");
     } catch (error: any) {
