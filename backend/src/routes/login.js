@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import expresss from 'express';
 import pool from '../lib/conexion.mjs';
+import { signToken } from '../middleware/auth.js';
 const router = expresss.Router();
 
 router.post("/login", async (req, res)=>{
@@ -29,8 +30,11 @@ router.post("/login", async (req, res)=>{
 
         }
         
+        const token = await signToken({ id: usuario.id_usuario, nombre: usuario.nombre, correo: usuario.correo });
+
         return res.status(200).json({
             message: "Inicio de sesión exitoso",
+            token,
             usuario: { id: usuario.id_usuario, nombre: usuario.nombre, correo: usuario.correo }
         });
     }

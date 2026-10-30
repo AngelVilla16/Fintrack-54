@@ -57,11 +57,11 @@ export default function Dashboard() {
     salud: '#E7B448',
     ocio: '#D8664F',
     transporte: '#FB6C00',
-    renta:'#403D88', 
-    
-    otros: '#8A94A6', 
+    renta:'#403D88',
+
+    otros: '#8A94A6',
   };
-  //Este es el value que entiende PieChart para tomar los datos de la grafica 
+  //Este es el value que entiende PieChart para tomar los datos de la grafica
   const [gastosData, setGastosData] = useState<
   { value: number; color: string; label: string; text: string }[]
 >([]);
@@ -108,7 +108,7 @@ useEffect(() => {
         if (idGuardado !== null) {
           setId(idGuardado);
           setName(nombreUsuario);
-        } 
+        }
       } catch (e) {
         console.error("Error al leer el ID de AsyncStorage", e);
       }
@@ -121,13 +121,15 @@ useEffect(() => {
     async function fetchSaldo(){
       try{
         const data = await getSaldo(id);
-        
+
         setSaldo(Number(data.saldo) || 0);
-        setLoad(false); // Ocultar el modal de carga una vez que se obtiene el saldo
 
       }
       catch(error){
         console.error("Error al traer el saldo del usuario", error);
+      }
+      finally {
+        setLoad(false); // Ocultar el skeleton una vez que se obtiene (o falla) el saldo
       }
 
     }
@@ -155,7 +157,7 @@ useEffect(() => {
     try{
       await AsyncStorage.removeItem("id_usuario");
       route.replace('/');
-      
+
     }
     catch(error){
       console.error("Error al cerrar la sesion");
@@ -168,7 +170,8 @@ useEffect(() => {
   const handleDeleteUser = async ()=>{
     setModalEliminar(false);
     try{
-      const res:any= await eliminarCuenta(id);
+      const res: any = await eliminarCuenta(id);
+      await AsyncStorage.removeItem('id_usuario');
       if(res.ok){
         route.push("/")
       }else{
@@ -185,8 +188,8 @@ useEffect(() => {
   const abrirModalEliminar = () => {
     setModalEliminar(true);
   }
-  
-  
+
+
   // Función para calcular el saldo acorde a la operación
   const handleIngreso = async () => {
     const monto = Number(ingreso);
@@ -204,17 +207,17 @@ useEffect(() => {
     }
 
     try {
-      setModalIngreso(false); 
+      setModalIngreso(false);
 
       const data = await regIngreso({ tipo, concepto, id, sumaIngreso, monto });
-    
+
       setIngreso("");
-      setSelected(""); 
+      setSelected("");
       setSaldo(sumaIngreso);
       Alert.alert("Ingreso registrado", concepto);
     }
     catch (error) {
-      setModalIngreso(true); 
+      setModalIngreso(true);
       console.log("Error en handleIngreso:", error);
       Alert.alert("Error", "Ocurrió un problema al registrar tu ingreso en el servidor.");
     }
@@ -394,17 +397,17 @@ useEffect(() => {
       style={styles.Background}
       resizeMode="cover">
       <SafeAreaView style={styles.container}>
-      {/* Modal que muestra la carga */}
-      <Modal animationType='fade' transparent={true}  visible={load}>
-        <View style={styles.modalLoad}>
-          <View style={styles.modalContent}>
-
-            <Text style={styles.modalTextTitle}>Cargando los datos del usuario... Espere por favor</Text>
-            <ActivityIndicator size="large" color="#05386b" />
-          </View>
+      {/* Skeleton de carga que sustituye al modal */}
+      {load && (
+        <View style={styles.skeletonContainer}>
+          <View style={styles.skeletonTitle} />
+          <View style={styles.skeletonCard} />
+          <View style={styles.skeletonRow} />
+          <View style={styles.skeletonRow} />
+          <View style={styles.skeletonRow} />
+          <View style={styles.skeletonChart} />
         </View>
-
-      </Modal>
+      )}
         {/* Modales para añadir gasto e ingreso */}
         <Modal animationType="fade" transparent={true} visible={modalIngreso}>
           <View style={styles.modalOverlay}>
@@ -579,9 +582,9 @@ useEffect(() => {
                   >
                     <Text style={styles.modalButtonText}>Otros</Text>
                   </Pressable>
-                  <Pressable 
+                  <Pressable
                     onPress={()=> setSelected("transporte")}
-                    style={[styles.modalButtonList, 
+                    style={[styles.modalButtonList,
                       selected === "transporte" && styles.modalButtonListPressable,]
                     }
                   >
@@ -595,7 +598,7 @@ useEffect(() => {
                     <Text style={styles.modalButtonText}>Renta</Text>
                   </Pressable>
 
-               
+
                 </View>
 
                 <Pressable
@@ -699,7 +702,7 @@ useEffect(() => {
         <View>
           <Text style={styles.title}>Bienvenido!</Text>
           <Text style={styles.subtitle}>{name}</Text>
-          
+
           {/* Sección de saldo disponible */}
           <View style={dynamicStyles.saldosection}>
             <View>
@@ -737,7 +740,7 @@ useEffect(() => {
                   centerLabelComponent={() => (
                     <Text style={{ color: '#fff', fontSize: 12 }}>Gastos</Text>
                   )}
-                  
+
                 />
               </View>
                 {/* Leyenda manual debajo */}
@@ -785,8 +788,8 @@ useEffect(() => {
           </View>
         </View>
         </ScrollView>
-    
-    
+
+
       </SafeAreaView>
     </ImageBackground>
   );
@@ -938,7 +941,7 @@ const styles = StyleSheet.create({
     minWidth: 120,
     alignItems: 'center',
     flexDirection:"column"
-    
+
   },
     modalButtonGasto: {
     margin: 20,
@@ -950,7 +953,7 @@ const styles = StyleSheet.create({
     minWidth: 120,
     alignItems: 'center',
     flexDirection:"column"
-    
+
   },
   modalButtonList: {
     padding: 5,
@@ -998,5 +1001,38 @@ const styles = StyleSheet.create({
     margin:3,
 
 
-  }
+  },
+  skeletonContainer: {
+    padding: 20,
+    gap: 12,
+  },
+  skeletonTitle: {
+    height: 24,
+    width: '60%',
+    backgroundColor: '#e0e0e0',
+    borderRadius: 6,
+    opacity: 0.7,
+  },
+  skeletonCard: {
+    height: 80,
+    width: '100%',
+    backgroundColor: '#e0e0e0',
+    borderRadius: 12,
+    opacity: 0.7,
+  },
+  skeletonRow: {
+    height: 16,
+    width: '100%',
+    backgroundColor: '#e0e0e0',
+    borderRadius: 6,
+    opacity: 0.7,
+  },
+  skeletonChart: {
+    height: 160,
+    width: '100%',
+    backgroundColor: '#e0e0e0',
+    borderRadius: 80,
+    opacity: 0.7,
+    alignSelf: 'center',
+  },
 });
